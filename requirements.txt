@@ -1,5 +1,4 @@
 requests
 argparse
 colorama
-timeit
 threading

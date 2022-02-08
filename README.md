@@ -60,6 +60,5 @@ python3 amyntas.py -t https://target.com -w 700 -m POST -d 40
 requests
 argparse
 colorama
-timeit
 threading
 ```
