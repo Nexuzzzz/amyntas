@@ -5,9 +5,9 @@ It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per s
 --- 
 
 ### About
-Current version: 1.0.<br>
-Full rewrite of the old version.
-Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods
+Current version: 1.0, full rewrite of the old version. <br>
+Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods and the capabilities to bypass caching systems. <br>
+Use at your own risk! I, the author, am not responsible for any harm you do! Keep that in mind!
 
 ---
 
