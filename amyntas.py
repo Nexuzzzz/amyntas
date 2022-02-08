@@ -73,10 +73,12 @@ except Exception as e:
   exit()
 
 method_dict = {
-  'GET': http_get,
-  'POST': http_post,
-  'HEAD': http_head,
-  'FAST': http_fast
+  'GET': http_get, # GET flood
+  'POST': http_post, # POST flood
+  'HEAD': http_head, # HEAD flood
+  'FAST': http_fast, # GET / flood
+  'GETHEADPOST': http_ghp, 'GHP': http_ghp, # GET/HEAD/POST flood
+
 }
 if args['target'] is None:
   sys.exit('[ERROR] No target specified.')
@@ -102,8 +104,8 @@ def main():
 
   print('\n')
 
-  if args['proxy'] != None:
-    print(f' Proxy: [{str(args["proxy"])}]')
+  #if args['proxy'] != None:
+  #  print(f' Proxy: [{str(args["proxy"])}]')
   
   if args['useragent'] is None:
     if debug: s_start = timer()

@@ -9,10 +9,19 @@ Current version: 1.0, full rewrite of the old version. <br>
 Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods and the capabilities to bypass caching systems. <br>
 Use at your own risk! I, the author, am not responsible for any harm you do! Keep that in mind!
 
+<br>
+
+Aviable methods
+- GET (simple GET flood)
+- HEAD (simple HEAD flood)
+- POST (simple POST flood)
+- FAST (a <strong>GET /</strong> flood)
+- GHP/GETHEADPOST (a flood which randomly chooses GET, HEAD or POST as request method)
+
 ---
 
 ### Features
-1. Ability to attack HTTPS sites
+1. IPv6 support
 2. Cache bypassing mechanisms
 3. Random headers (user agents, referers)
 4. Real time "worker" system

