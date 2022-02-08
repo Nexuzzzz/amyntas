@@ -61,4 +61,5 @@ requests
 argparse
 colorama
 threading
+netaddr
 ```

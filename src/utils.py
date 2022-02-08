@@ -1,5 +1,5 @@
 # import modules
-import os, requests, socket, socks
+import os, requests, socket
 from random import randint, choice, shuffle, random
 from string import ascii_letters, digits, ascii_uppercase
 from netaddr import IPAddress, IPNetwork
@@ -87,11 +87,6 @@ def randstr(strlen, chars=ascii_letters):
     '''
     
     return ''.join(choice(chars) for _ in range(strlen))
-
-def setproxy(proxy_ip, proxy_port, proxy_type):
-    '''
-    Function to monkeypatch all socket objects to use the specified proxy
-    '''
 
 class HTTPAdapter(requests.adapters.HTTPAdapter):
     '''
