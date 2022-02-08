@@ -1,33 +1,37 @@
 ## NOTE!
-Results may vary A LOT when attacking! It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know!
+Results may vary A LOT when attacking! <br>
+It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know!
 
 --- 
 
-### about
-Current version: 5.0.
-This script is for volumetric layer 7 attacks, not for stealthy and powerfull attacks!
+### About
+Current version: 1.0.<br>
+Full rewrite of the old version.
+Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods
 
 ---
 
-### features
+### Features
 1. Ability to attack HTTPS sites
+2. Cache bypassing mechanisms
+3. Random headers (user agents, referers)
+4. Real time "worker" system
+5. Supports custom user-agent and referer
 
 ---
 
-### known bugs/problems
-1. Timing is a bit egh, because thread 1 is already busy attacking when thread 70 just started (for example)
-2. Proxies get obliterated when attacking (need to fix)
-4. Sometimes script gives "Fatal Python" errors, just ignore them and restart the tool if neccesary
+### Known bugs/problems
+1. Proxies get killed quickly, therefore no option has been added
 
 ---
 
-### to do list
-1. Better exception handling
-2. ....
+### To Do list
+1. More methods
+2. More documentation
 
 ---
 
-### usage
+### Usage
 All options:
 ```
 python3 amyntas.py -h
@@ -38,24 +42,24 @@ Basic usage:
 python3 amyntas.py -t https://target.com
 ```
 
-Brute power, 700 threads hammering for 40 seconds:
+GET flood, attacking with 100 threads for 1337 seconds:
 ```
 python3 amyntas.py -t https://target.com -w 700 -d 40
 ```
 
+POST flood, attacking with 700 threads for 40 seconds:
+```
+python3 amyntas.py -t https://target.com -w 700 -m POST -d 40
+```
+
 ---
 
-### images
-Note, these are a bit old because i am too lazy to make new screenshots lmao
+### Requirements
 
-23k requests per second
-![23k](https://github.com/Switch1024/amyntas/blob/main/images/23k_dstat.png?raw=true)
-
-30k requests per second
-![30k](https://github.com/Switch1024/amyntas/blob/main/images/30k_dstat.png?raw=true)
-
-507k requests per second
-![507k](https://github.com/Switch1024/amyntas/blob/main/images/507k_dstat.png?raw=true)
-
-3.1 million requests per second (no idea if this was me)
-![3.1mil](https://github.com/Switch1024/amyntas/blob/main/images/3.1mil_dstat.png?raw=true)
+```
+requests
+argparse
+colorama
+timeit
+threading
+```
