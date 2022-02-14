@@ -5,7 +5,7 @@ It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per s
 --- 
 
 ### About
-Current version: 1.0, full rewrite of the old version. <br>
+Current version: 1.0.1, full rewrite of the old version. <br>
 Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods and the capabilities to bypass caching systems. <br>
 Use at your own risk! I, the author, am not responsible for any harm you do! Keep that in mind!
 
@@ -17,6 +17,8 @@ Aviable methods
 - POST (simple POST flood)
 - FAST (a <strong>GET /</strong> flood)
 - GHP/GETHEADPOST (a flood which randomly chooses GET, HEAD or POST as request method)
+- LEECH (a low & slow HTTP GET flood which can drain A LOT of bandwith)
+- MIX (a method which randomly chooses HTTP request methods)
 
 ---
 

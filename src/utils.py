@@ -131,7 +131,7 @@ def buildblock(url):
     '''
     
     if Core.bypass_cache:
-        block = '' if url != None and url.endswith('/') else '' if url != None and not url.endswith('/') else ''
+        block = '' if url != None and url.endswith('/') else '/' if url != None and not url.endswith('/') else ''
 
         block += randstr(randint(5, 10))
         for _ in range(randint(2, 10)):
