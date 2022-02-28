@@ -106,6 +106,12 @@ Core.proxy_resolve = args['proxy_resolve']
 if not args['method'].upper() in method_dict.keys():
   sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method')
 
+if args['proxy'] != None and args['detect_firewall']:
+  yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  if yorn.startswith('N'): args['detect_firewall'] = False
+  else: print('Alright, i warned ya!')
+  time.sleep(2) # a small timeout if the user reconsiders his choice
+
 init() # initialize console
 print_lock = threading.Lock() # creates a "lock" variable
 
