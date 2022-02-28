@@ -8,3 +8,9 @@ class Core:
     bypass_cache = False # wether we should bypass the caching system of the host
     attack_length = 0 # used for passing the attack duration
     avg_rps = 0.0 # average rps counter
+
+    proxy = None
+    proxy_type = 'SOCKS5'
+    proxy_user = None
+    proxy_passw = None
+    proxy_resolve = True

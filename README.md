@@ -28,11 +28,12 @@ Aviable methods
 3. Random headers (user agents, referers)
 4. Real time "worker" system
 5. Supports custom user-agent and referer
+6. Proxy support (Rotating proxies coming soon)
 
 ---
 
 ### Known bugs/problems
-1. Proxies get killed quickly, therefore no option has been added
+1. Attack does not end when you want it to end
 
 ---
 
