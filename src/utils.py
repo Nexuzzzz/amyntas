@@ -193,6 +193,8 @@ def buildheaders(url, useragent, referer):
     Function to generate randomized headers
     '''
 
+    reflist.append(url+buildblock(url))
+
     cache_controls = ['no-cache', 'max-age=0']
     accept_encodings = ['*', 'identity', 'gzip', 'deflate']
     accept_charsets = ['ISO-8859-1', 'utf-8', 'Windows-1251', 'ISO-8859-2', 'ISO-8859-15']
@@ -201,13 +203,15 @@ def buildheaders(url, useragent, referer):
     # we shuffle em
     for toshuffle in [cache_controls, accept_encodings, accept_charsets, content_types, accepts]:
         shuffle(toshuffle)
+    
+    if randint(0,1) == 1: headers = { 'X-Requested-With': 'XMLHttpRequest'}
+    else: headers = { 'User-Agent': choice(ualist) if useragent == None else useragent }
 
-    headers = {
-        'User-Agent': choice(ualist) if useragent == None else useragent,
+    headers.update({
         'Cache-Control': ', '.join(cache_controls[:randint(1,len(cache_controls))]),
         'Accept-Encoding': ', '.join(accept_encodings[:randint(1,len(accept_encodings))]),
         'Accept': ', '.join(accepts[:randint(1,len(accepts))])
-    }
+    })
 
     # "random" headers
     if randint(0,1) == 1:
@@ -225,6 +229,10 @@ def buildheaders(url, useragent, referer):
         headers.update({'Cookie': randstr(randint(60, 90), chars=ascii_uppercase+str(digits))})
     
     if randint(0,1) == 1:
-        headers.update({'X-Forwarded-For': randip()})
+        spoofip = randip()
+        headers.update({
+            'Via': spoofip,
+            'X-Forwarded-For': spoofip
+        })
     
     return headers
