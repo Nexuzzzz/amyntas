@@ -230,4 +230,5 @@ if __name__ == '__main__':
     time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
     if Core.attackrunning: 
       clear()
+  
   print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}')+frr)

@@ -46,7 +46,22 @@ Aviable methods
 ### Usage
 All options:
 ```
-python3 amyntas.py -h
+-h, --help                             Show this help message and exit
+-t TARGET, --target TARGET             Target URL (Example: https://google.com or http://pornhub.com)
+-p PORT, --port PORT                   Target port (Leave empty to let the tool decide)
+-d DURATION, --duration DURATION       Attack duration
+--proxy PROXY                          Use a proxy when attacking (Example: 127.0.0.1:1337)
+--proxy-type PROXY_TYPE                Set the proxy type (HTTP, SOCKS4 or SOCKS5)
+--proxy-user PROXY_USER                Proxy username
+--proxy-pass PROXY_PASS                Proxy password
+--proxy-resolve PROXY_RESOLVE          Resolve host using proxy (needed for hidden service targets)
+-ua USERAGENT, --user-agent USERAGENT  User agent to use when attacking, else its dynamic
+-ref REFERER, --referer REFERER        Referer to use when attacking, else its dynamic
+-w WORKERS, --workers WORKERS          Amount of workers/threads to use when attacking
+-dbg, --debug                          Print info for devs
+-bc, --bypass-cache                    Bypass the cache of the site
+-m METHOD, --method METHOD             Method to use when attacking (default: GET)
+-dfw, --detect-firewall                Detect if the target site is protected by a firewall
 ```
 
 Basic usage:
