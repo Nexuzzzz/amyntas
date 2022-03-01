@@ -18,7 +18,7 @@ else:
   parser.add_argument(        '--proxy-type',     dest = 'proxy_type',     default = 'SOCKS5', help='Set the proxy type (HTTP, SOCKS4 or SOCKS5)', type=str)
   parser.add_argument(        '--proxy-user',     dest = 'proxy_user',     default = None,     help='Proxy username', type=str)
   parser.add_argument(        '--proxy-pass',     dest = 'proxy_pass',     default = None,     help='Proxy password', type=str)
-  parser.add_argument(        '--proxy-resolve',  dest = 'proxy_resolve',  default = True,     help='Resolve host using proxy (needed for hidden service targets)', type=str)
+  parser.add_argument(        '--proxy-resolve',  dest = 'proxy_resolve',  default = True,     help='Resolve host using proxy (needed for hidden service targets)', action='store_true')
   parser.add_argument('-ua',  '--user-agent',     dest = 'useragent',      default = None,     help='User agent to use when attacking, else its dynamic', type=str)
   parser.add_argument('-ref', '--referer',        dest = 'referer',        default = None,     help='Referer to use when attacking, else its dynamic', type=str)
   parser.add_argument('-w',   '--workers',        dest = 'workers',        default = 100,      help='Amount of workers/threads to use when attacking', type=int)

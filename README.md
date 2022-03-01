@@ -54,7 +54,7 @@ All options:
 --proxy-type PROXY_TYPE                Set the proxy type (HTTP, SOCKS4 or SOCKS5)
 --proxy-user PROXY_USER                Proxy username
 --proxy-pass PROXY_PASS                Proxy password
---proxy-resolve PROXY_RESOLVE          Resolve host using proxy (needed for hidden service targets)
+--proxy-resolve                        Resolve host using proxy (needed for hidden service targets)
 -ua USERAGENT, --user-agent USERAGENT  User agent to use when attacking, else its dynamic
 -ref REFERER, --referer REFERER        Referer to use when attacking, else its dynamic
 -w WORKERS, --workers WORKERS          Amount of workers/threads to use when attacking
