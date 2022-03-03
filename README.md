@@ -1,6 +1,7 @@
 ## NOTE!
 Results may vary A LOT when attacking! <br>
-It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know!
+It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know! <bn>
+The webdrivers used for the <strong>Browser Emulation</strong> attack are Windows 64 bit executables, replace them if you need to!!
 
 --- 
 

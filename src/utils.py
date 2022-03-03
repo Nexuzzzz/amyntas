@@ -5,6 +5,10 @@ from string import ascii_letters, digits, ascii_uppercase
 from netaddr import IPAddress, IPNetwork
 from urllib.parse import urlparse
 from src.core import *
+#from selenium import webdriver
+#from selenium.webdriver.firefox.options import Options as ffOptions
+#from selenium.webdriver.chrome.options import Options as chrOptions
+#from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 ualist = []
 with open('src/lists/useragents.txt', 'r') as uafile:
@@ -27,6 +31,10 @@ with open('src/lists/cf_ips.txt', 'r') as cffile:
     [cf_ips.append(line.rstrip()) for line in cffile.readlines()]
 
 def fwDetect(url):
+    '''
+    Function to detect firewalls
+    '''
+    
     fwdict = {
         'cloudflare': 'Cloudflare Inc', 'cloudflare-nginx': 'Cloudflare Inc', 'cf-ray': 'Cloudflare Inc',
         'sucuri/cloudproxy': 'Sucuri',
@@ -103,10 +111,8 @@ def clear():
     Simple function to clear screen
     '''
 
-    try:
-        os.system('cls' if os.name == 'nt' else 'clear')
-    except:
-        pass
+    try: os.system('cls' if os.name == 'nt' else 'clear')
+    except: pass
 
 def randip():
     '''
@@ -158,7 +164,8 @@ def createsession():
     session.allow_redirects = False
     session.timeout = (5, 2)
     session.trust_env = False
-    if Core.proxy != None:
+
+    if Core.proxy != None: # sets proxy
         proxurl = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{Core.proxy_user if Core.proxy_user != None else ""}{":"+Core.proxy_passw if Core.proxy_passw != None else ""}{"@" if Core.proxy_user != None else "@" if Core.proxy_passw != None else ""}{Core.proxy}'
         session.proxies = { 'http': proxurl, 'https': proxurl }
     else: session.proxies = {}
@@ -236,3 +243,127 @@ def buildheaders(url, useragent, referer):
         })
     
     return headers
+
+'''
+def getdriver(useragent):
+    driver = None
+    if Core.browser_type == 'FIREFOX':
+        useragents = [
+            "Mozilla/5.0 (Windows NT 5.1; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 5.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.0; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.0; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; MNCache; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0 Cyberfox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0 IceDragon/50.0.0.2",
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/50.0 slurp",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0 IceDragon/50.0.0.2",
+            "Mozilla/5.0 (Windows NT 6.2; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 10.0; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0 FirePHP/0.7.4",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0 IceDragon/50.0.0.2",
+            "Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:50.0) Gecko/20100101 Firefox/50.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0.2",
+            "Mozilla/5.0 (Windows NT 5.1; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 5.2; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.0; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1; rv:51.0) Gecko/20100101 Goanna/2.2 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0 ColdFire/1.11.208.251"
+        ]
+
+        ff_profile = webdriver.FirefoxProfile()
+        for key, value in {
+            'general.useragent.override': choice(useragents) if useragent != None else useragent,
+            'config.trim_on_minimize': True,
+            'nglayout.initialpaint.delay': 0,
+            'content.notify.backoffcount': 5,
+            'content.notify.interval': 849999,
+            'content.interrupt.parsing': True,
+            'browser.blink_allowed': False,
+            'ui.submenuDelay': 0,
+            'security.dialog_enable_delay': 0,
+            'network.prefetch-next': False,
+            'layout.frame_rate.precise': True,
+            'webgl.force-enabled': True,
+            'layers.acceleration.force-enabled': True,
+            'layers.offmainthreadcomposition.enabled': True,
+            'layers.offmainthreadcomposition.async-animations': True,
+            'layers.async-video.enabled': True,
+            'html5.offmainthread': True,
+            'browser.cache.memory.capacity': 128,
+            'browser.tabs.animate': False,
+            'browser.download.animateNotifications': False,
+            'javascript.options.mem.high_water_mark': 128}.items():
+            try: ff_profile.set_preference(key, value)
+            except: pass
+
+        ff_options = ffOptions()
+        ff_options.add_argument('--headless')
+        ff_options.add_argument('--safe-mode')
+        ff_options.add_argument('--no-remote')
+        ff_options.add_argument('--private')
+
+        driver = webdriver.Firefox(executable_path='src/drivers/geckodriver.exe', options=ff_options, firefox_profile=ff_profile)
+
+    elif Core.browser_type == 'CHROME':
+        useragents = [
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.1331.54 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2909.1022 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2909.1022 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.0.1471.813 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2015.1007 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2107.204 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2909.1213 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.0.1308.1016 Safari/420815",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2015.1007 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2909.1022 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2015.1007 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.0.1471.914 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2015.1007 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 UBrowser/6.1.2909.1022 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.18 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.75 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.87 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+            "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.94 Safari/537.36",
+        ]
+
+        options = chrOptions()
+        options.add_argument('--headless')
+        options.add_argument('--disable-extensions')
+        options.add_argument('--profile-directory=Default')
+        options.add_argument("--incognito")
+        options.add_argument("--disable-plugins-discovery")
+        options.add_argument(f'user-agent={userAgent}')
+        driver = webdriver.Chrome(chrome_options=options, executable_path='/src/drivers/chromedriver.exe')
+    else:
+        sys.exit('No driver found.')
+
+    #driver.delete_all_cookies()
+    return driver
+'''

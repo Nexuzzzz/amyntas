@@ -8,6 +8,7 @@ class Core:
     bypass_cache = False # wether we should bypass the caching system of the host
     attack_length = 0 # used for passing the attack duration
     avg_rps = 0.0 # average rps counter
+    #browser_type = 'FIREFOX' # browser type
 
     proxy = None
     proxy_type = 'SOCKS5'

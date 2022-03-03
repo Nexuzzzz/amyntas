@@ -104,10 +104,14 @@ Core.proxy_pass = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
 if not args['method'].upper() in method_dict.keys():
-  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method')
+  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method.')
+
+#if args['browser_type'] == 'FIREFOX' and not os.path.isdir('src/drivers/geckodriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Firefox driver!')
+#elif args['browser_type'] == 'CHROME' and not os.path.isdir('src/drivers/chromedriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Chrome driver!')
+#elif not args['browser_type'].upper() in ['FIREFOX', 'CHROME']: sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid browser type!')
 
 if args['proxy'] != None and args['detect_firewall']:
-  yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  yorn = input('[WARN] Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
   if yorn.startswith('N'): args['detect_firewall'] = False
   else: print('Alright, i warned ya!')
   time.sleep(2) # a small timeout if the user reconsiders his choice

