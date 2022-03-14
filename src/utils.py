@@ -48,7 +48,7 @@ def fwDetect(url):
 
     try:
         for i in cf_ips: # first we check if its CF only
-            if IPAddress(socket.gethostbyname(urlparse(args['target']).netloc)) in IPNetwork(i):
+            if IPAddress(socket.gethostbyname(urlparse(url).netloc)) in IPNetwork(i):
                 return 'Cloudflare Inc'
 
         req = requests.get(url)
@@ -80,7 +80,7 @@ def isIPv6(ip):
     Function to check if a IP is a valid IPv6 address'''
 
     try:
-        socket.inet_pton(socket.AF_INET6, ipv6Address)
+        socket.inet_pton(socket.AF_INET6, ip)
 
         return True
     except:

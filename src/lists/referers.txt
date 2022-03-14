@@ -46,6 +46,7 @@ http://95.143.41.21:8089/?q=
 http://about42.nl/www/showheaders.php;POST;about42.nl.txt
 http://agenzia-anna.com/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://anonymouse.org/cgi-bin/anon-www.cgi/
+http://badoo.com/01244944965/?r=37.4&p=1
 http://basketgbkoekelare.be/plugins/content/plugin_googlemap2_proxy.php?url=
 http://bbtoma.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://bemaxjavea.com/javea-rentals-alquileres/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -65,6 +66,7 @@ http://diegoborba.com.br/andes/plugins/system/plugin_googlemap2/plugin_googlemap
 http://doleorganic.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://donellis.ie/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://engadget.search.aol.com/search?q=
+http://engadget.search.aol.com/search?q=query?=query=
 http://engadget.search.aol.com/search?q=query?=query=&q=
 http://eu.battle.net/wow/en/search?q=
 http://feedvalidator.org/check.cgi?url=
@@ -75,6 +77,7 @@ http://gminazdzieszowice.pl/plugins/system/plugin_googlemap3/plugin_googlemap3_p
 http://gmodules.com/ig/creator?url=
 http://go.mail.ru/search?gay.ru.query=1&q=?abc.r&q=
 http://go.mail.ru/search?gay.ru.query=1&q=?abc.r/
+http://go.mail.ru/search?gay.ru.query=1&q=?abc.r/#hl=en-US?&newwindow=1&safe=off&sclient=psy=?-ab&query=%D0%BA%D0%B0%Dq=?0%BA+%D1%83%()_D0%B1%D0%B=8%D1%82%D1%8C+%D1%81bvc?&=query&%D0%BB%D0%BE%D0%BD%D0%B0q+=%D1%80%D1%83%D0%B6%D1%8C%D0%B5+%D0%BA%D0%B0%D0%BA%D0%B0%D1%88%D0%BA%D0%B0+%D0%BC%D0%BE%D0%BA%D0%B0%D1%81%D0%B8%D0%BD%D1%8B+%D1%87%D0%BB%D0%B5%D0%BD&oq=q=%D0%BA%D0%B0%D0%BA+%D1%83%D0%B1%D0%B8%D1%82%D1%8C+%D1%81%D0%BB%D0%BE%D0%BD%D0%B0+%D1%80%D1%83%D0%B6%D1%8C%D0%B5+%D0%BA%D0%B0%D0%BA%D0%B0%D1%88%D0%BA%D0%B0+%D0%BC%D0%BE%D0%BA%D1%DO%D2%D0%B0%D1%81%D0%B8%D0%BD%D1%8B+?%D1%87%D0%BB%D0%B5%D0%BD&gs_l=hp.3.192787.206313.12.206542.48.46.2.0.0.0.190.7355.0j43.45.0.clfh0.0.ytz2PqzhMAc&pbx=1&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.,cf.osb&fp=fd2cf4e896a87c19&biw=1680&bih=?882
 http://go.mail.ru/search?mail.ru=1&q=
 http://grandsultansaloon.com/plugins/system/plugin_googlemap2_proxy.php?url=
 http://greenappledentaldt.com/home/templates/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -94,6 +97,7 @@ http://klaassienatuinstra.nl/plugins/content/plugin_googlemap2_proxy.php?url=
 http://kobbeleia.net/joomla/plugins/content/plugin_googlemap2_proxy.php?url=
 http://krd-medway.co.uk/site/plugins/content/plugin_googlemap2_proxy.php?url=
 http://lab.univ-batna.dz/lea/plugins/system/plugin_googlemap2_proxy.php?url=
+http://landing.pcwhatsap.com/1/?offer_id=3534&aff=1788&url_id=5618&sub_id=whatsapp_pop
 http://laresmadrid.org/plugins/system/plugin_googlemap3/plugin_googlemap3_proxy.php?url=
 http://lavori.joomlaskin.it/italyhotels/wp-content/plugins/js-multihotel/includes/show_image.php?w=1&h=1&file=
 http://link2europe.com/joomla/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -102,9 +106,12 @@ http://mentzerrepairs.com/plugins/system/plugin_googlemap2_proxy.php?url=
 http://millercenter.org/search?q=
 http://minterne.co.uk/mjs/plugins/content/plugin_googlemap2_proxy.php?url=
 http://mobilrecord.com/plugins/content/plugin_googlemap2_proxy.php?url=
+http://movies.netflix.com/WiPlayer?movieid=70136122&trkid=7882978&t=Weeds
 http://netsec-reborn.onion/QuickStresser-virus?id=
+http://nova.rambler.ru/search?=btnG?=%D0?2?%D0?2?%=D0
 http://nova.rambler.ru/search?=btnG?=%D0?2?%D0?2?%=D0&q=
 http://nova.rambler.ru/search?=btnG?=%D0?2?%D0?2?%=D0/
+http://nova.rambler.ru/search?btnG=%D0%9D%?D0%B0%D0%B
 http://nova.rambler.ru/search?btnG=%D0%9D%?D0%B0%D0%B&q=
 http://nova.rambler.ru/search?btnG=%D0%9D%?D0%B0%D0%B/
 http://old.ucpb.org/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -113,16 +120,20 @@ http://page-xirusteam.rhcloud.com/f5ddos3.html?v=
 http://panel.stopthehacker.com/services/validate-payflow?email=1@1.com&callback=a&target=
 http://peelmc.ca/plugins/content/plugin_googlemap2_proxy.php?url=
 http://php-hrdevil.rhcloud.com/f5ddos3.html?v=
-http://ping-admin.ru/index.sema;POST;ping-admin.ru.txt
+http://ping-admin.ru/index.sema;POST;ping-admin.ru.txt/
+http://pl.wikipedia.org/wiki/Tr%C4%85dzik_m%C5%82odzie%C5%84czy
 http://policlinicamonteabraao.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://potholepeople.co.nz/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://prosperitydrug.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://qa-dev.w3.org/unicorn/check?ucn_task=conformance&ucn_uri=
 http://regex.info/exif.cgi?url=
+http://ru.search.yahoo.com/search;?_query?=l%t=?=?A7x
 http://ru.search.yahoo.com/search;?_query?=l%t=?=?A7x&q=
 http://ru.search.yahoo.com/search;?_query?=l%t=?=?A7x/
+http://ru.search.yahoo.com/search;_yzt=?=A7x9Q.bs67zf
 http://ru.search.yahoo.com/search;_yzt=?=A7x9Q.bs67zf&q=
 http://ru.search.yahoo.com/search;_yzt=?=A7x9Q.bs67zf/
+http://ru.wikipedia.org/wiki/%D0%9C%D1%8D%D1%x80_%D0%
 http://ru.wikipedia.org/wiki/%D0%9C%D1%8D%D1%x80_%D0%&q=
 http://ru.wikipedia.org/wiki/%D0%9C%D1%8D%D1%x80_%D0%/
 http://s2p.lt/main/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -130,6 +141,7 @@ http://santaclaradelmar.com/hoteles/wp-content/plugins/js-multihotel/includes/sh
 http://scu-oldesloe.de/plugins/system/plugin_googlemap3/plugin_googlemap3_proxy.php?url=
 http://search.aol.com/aol/search?q=
 http://secret.leylines.info/plugins/system/plugin_googlemap3/plugin_googlemap3_proxy.php?url=
+http://seriescoreanas.com/online/faith/faith-capitulo-17.html
 http://smartonecity.com/pt/plugins/content/plugin_googlemap2_proxy.php?url=
 http://snelderssport.nl/web/plugins/content/plugin_googlemap2_proxy.php?url=
 http://sova-tour.com.ua/plugins/system/plugin_googlemap2_proxy.php?url=
@@ -184,6 +196,7 @@ http://www.bongert.lu/plugins/system/plugin_googlemap3/plugin_googlemap3_proxy.p
 http://www.build.or.at/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.bus-reichert.eu/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://www.caiverbano.it/sito/plugins/content/plugin_googlemap2_proxy.php?url=
+http://www.cartagena.gov.co/
 http://www.cbcstittsville.com/home/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.centroaquaria.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.ciutatdeivissa.org/portal/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -199,6 +212,7 @@ http://www.dbaa.co.za/plugins/system/plugin_googlemap3/plugin_googlemap3_proxy.p
 http://www.dierenhotelspaubeek.nl/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.dog-ryusen.com/plugins/system/plugin_googlemap2_proxy.php?url=
 http://www.dunaexpert.hu/home/plugins/content/plugin_googlemap2_proxy.php?url=
+http://www.eldivisadero.cl/noticias/?task=show&id=37352
 http://www.epcelektrik.com/en/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://www.evidence.nhs.uk/search?q=
 http://www.fare-furore.com/com-line/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -215,6 +229,7 @@ http://www.google.com/?q=
 http://www.google.com/ig/add?feedurl=
 http://www.google.com/ig/adde?moduleurl=
 http://www.google.com/translate?u=
+http://www.google.ru/url?sa=t&rct=?j&q=&e
 http://www.google.ru/url?sa=t&rct=?j&q=&e&q=
 http://www.google.ru/url?sa=t&rct=?j&q=&e/
 http://www.gretnadrug.com/plugins/system/plugin_googlemap2_proxy.php?url=
@@ -226,6 +241,7 @@ http://www.icel.be/cms/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.idea-designer.com/idea/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.iguassusoft.com/site/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.jana-wagenknecht.de/wcms/plugins/content/plugin_googlemap2_proxy.php?url=
+http://www.joyspizza.cl/
 http://www.kanzlei-berendes.de/homepage/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.keenecinemas.com/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
 http://www.kita-spielhaus.de/cms/plugins/content/plugin_googlemap2_proxy.php?url=
@@ -264,6 +280,8 @@ http://www.rethinkingjournalism.com/plugins/content/plugin_googlemap2_proxy.php?
 http://www.riegler-dorner.at/joomla/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.rinner-alm.com/plugins/system/plugin_googlemap2_proxy.php?url=
 http://www.rotisseriesalaberry.com/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
+http://www.rumoreweb.it/index.php?option=com_news_portal&view=category&id=21&Itemid=259
+http://www.santander.cl/
 http://www.sealyham.sk/joomla/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.search.com/search?q=
 http://www.seebybike.com/plugins/system/plugin_googlemap2/plugin_googlemap2_proxy.php?url=
@@ -287,6 +305,7 @@ http://www.topsiteminecraft.com/site/pinterest.com/search?q=
 http://www.translate.ru/url/translation.aspx?direction=er&sourceURL=
 http://www.triatarim.com.tr/TriaEn/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.tus-haltern.de/site/plugins/content/plugin_googlemap2_proxy.php?url=
+http://www.uaeinteract.com/news/default3.asp?ID=260/
 http://www.uchlhr.com/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.usatoday.com/search/results?q=
 http://www.ustream.tv/search?q=
@@ -310,6 +329,7 @@ http://www.yerbabuenacuisine.com/plugins/system/plugin_googlemap2_proxy.php?url=
 http://www.yigilca.gov.tr/_tr/plugins/content/plugin_googlemap2_proxy.php?url=
 http://www.zahnarzt-buhl.de/praxis/plugins/content/plugin_googlemap2_proxy.php?url=
 http://yandex.ru/yandsearch?text=
+http://yandex.ru/yandsearch?text=%D1%%D2%?=g.sql()81%
 http://yandex.ru/yandsearch?text=%D1%%D2%?=g.sql()81%&q=
 http://ytmnd.com/search?q=
 https://add.my.yahoo.com/rss?url=
@@ -330,7 +350,9 @@ https://pornhub.com/
 https://r.search.yahoo.com/
 https://soda.demo.socrata.com/resource/4tka-6guv.json?$q=
 https://steamcommunity.com/market/search?q=
+https://vk.com/profile.php?auto=
 https://vk.com/profile.php?redirect=
+https://wikiless.org/
 https://www.baidu.com?
 https://www.bing.com/search?q=
 https://www.cia.gov/index.html
@@ -348,8 +370,11 @@ https://www.google.com.ag/search?q=
 https://www.google.com.ai/search?q=
 https://www.google.com/search?q=
 https://www.google.com?
+https://www.google.ru/#hl=ru&newwindow=1&safe,iny+gay+q=pcsny+=;zdr+query?=poxy+pony&gs_l=hp.3.r?=.0i19.505.10687.0.10963.33.29.4.0.0.0.242.4512.0j26j3.29.0.clfh0.0.dLyKYyh2BUc&pbx=1&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.,cf.osb&fp?=?fd2cf4e896a87c19&biw=1389&bih=832
+https://www.google.ru/#hl=ru&newwindow=1&safe,or.r_gc.r_pw.r_cp.r_qf.,cf.osb&fp=fd2cf4e896a87c19&biw=1680&bih=925
 https://www.google.ru/#hl=ru&newwindow=1&safe..,iny+gay+q=pcsny+=;zdr+query?=poxy+pony&gs_l=hp.3.r?=.0i19.505.10687.0.10963.33.29.4.0.0.0.242.4512.0j26j3.29.0.clfh..0.0.dLyKYyh2BUc&pbx=1&bav=on.2,or.r_gc.r_pw.r_cp.r_qf.,cf.osb&fp?=?fd2cf4e896a87c19&biw=1389&bih=832&q=
 https://www.google.ru/#hl=ru&newwindow=1&safe..,or.r_gc.r_pw.r_cp.r_qf.,cf.osb&fp=fd2cf4e896a87c19&biw=1680&bih=925&q=
+https://www.google.ru/#hl=ru&newwindow=1?&saf,or.r_gc.r_pw=?.r_cp.r_qf.,cf.osb&fp=fd2cf4e896a87c19&biw=1680&bih=882
 https://www.google.ru/#hl=ru&newwindow=1?&saf..,or.r_gc.r_pw=?.r_cp.r_qf.,cf.osb&fp=fd2cf4e896a87c19&biw=1680&bih=882&q=
 https://www.npmjs.com/search?q=
 https://www.om.nl/vaste-onderdelen/zoeken/?zoeken_term=

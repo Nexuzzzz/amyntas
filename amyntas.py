@@ -100,7 +100,7 @@ Core.bypass_cache = args['bypass_cache']
 Core.proxy = args['proxy']
 Core.proxy_type = args['proxy_type']
 Core.proxy_user = args['proxy_user']
-Core.proxy_pass = args['proxy_pass']
+Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
 if not args['method'].upper() in method_dict.keys():
