@@ -1,10 +1,11 @@
 # import modules
-import os, requests, socket
+import os, requests, socket, time
 from random import randint, choice, shuffle, random
 from string import ascii_letters, digits, ascii_uppercase
 from netaddr import IPAddress, IPNetwork
 from urllib.parse import urlparse
 from src.core import *
+import undetected_chromedriver as webdriver
 #from selenium import webdriver
 #from selenium.webdriver.firefox.options import Options as ffOptions
 #from selenium.webdriver.chrome.options import Options as chrOptions
@@ -29,6 +30,53 @@ with open('src/lists/keywords.txt', 'r') as kwfile:
 cf_ips = []
 with open('src/lists/cf_ips.txt', 'r') as cffile:
     [cf_ips.append(line.rstrip()) for line in cffile.readlines()]
+
+def get_cookie(url):
+    '''
+    Gets CF cookie, which is basically a entry ticket
+    '''
+
+    options = webdriver.ChromeOptions()
+    arguments = [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox', 
+        '--disable-infobars', 
+        '--disable-logging', 
+        '--disable-login-animations',
+        '--disable-notifications', 
+        '--disable-gpu', 
+        '--headless', 
+        '--lang=ko_KR', 
+        '--start-maxmized',
+        '--user-agent=Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60 MicroMessenger/6.5.18 NetType/WIFI Language/en' 
+    ]
+
+    for argument in arguments:
+        options.add_argument(argument)
+
+    driver = webdriver.Chrome(options=options, driver_executable_path='src\\drivers\\chromedriver.exe')
+    driver.implicitly_wait(3)
+    driver.get(url)
+
+    for _ in range(60):
+        cookies = driver.get_cookies()
+        tryy = 0
+
+        for i in cookies:
+            if i['name'] == 'cf_clearance':
+                Core.bypass_cookieJAR = driver.get_cookies()[tryy]
+                Core.bypass_useragent = driver.execute_script("return navigator.userAgent")
+                Core.bypass_cookie = f"{Core.bypass_cookieJAR['name']}={Core.bypass_cookieJAR['value']}"
+                driver.quit()
+
+                return True
+            else:
+                tryy += 1
+                pass
+
+        time.sleep(1)
+    driver.quit()
+    return False
 
 def fwDetect(url):
     '''
@@ -145,7 +193,7 @@ class HTTPAdapter(requests.adapters.HTTPAdapter):
             kwargs["socket_options"] = self.socket_options
         super(HTTPAdapter, self).init_poolmanager(*args, **kwargs)
 
-def createsession():
+def createsession(verify=False, trust_env=False):
     '''
     Function that creates a requests session object used when attacking
     '''
@@ -160,10 +208,8 @@ def createsession():
     session = requests.session()
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    session.verify = False
-    session.allow_redirects = False
-    session.timeout = (5, 2)
-    session.trust_env = False
+    session.verify = verify
+    session.trust_env = trust_env
 
     if Core.proxy != None: # sets proxy
         proxurl = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{Core.proxy_user if Core.proxy_user != None else ""}{":"+Core.proxy_passw if Core.proxy_passw != None else ""}{"@" if Core.proxy_user != None else "@" if Core.proxy_passw != None else ""}{Core.proxy}'

@@ -1,5 +1,7 @@
 requests
 argparse
 colorama
-threading
 netaddr
+cloudscraper
+selenium
+undetected_chromedriver

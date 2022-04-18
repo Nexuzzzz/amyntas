@@ -19,6 +19,7 @@ Aviable methods
 - GHP/GETHEADPOST (a flood which randomly chooses GET, HEAD or POST as request method)
 - LEECH (a low & slow HTTP GET flood which can drain A LOT of bandwith)
 - MIX (a method which randomly chooses HTTP request methods)
+- BYPASS (bypasses cloudflare)
 
 ---
 

