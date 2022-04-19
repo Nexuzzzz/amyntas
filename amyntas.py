@@ -56,14 +56,6 @@ except Exception as e:
   if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
-# define some basic colors
-fr = Fore.RED
-fy = Fore.YELLOW
-fw = Fore.WHITE
-fg = Fore.GREEN
-fg2 = Fore.LIGHTBLACK_EX
-frr = Fore.RESET
-
 # Import depencies
 print(f'{fy}[{fw}INFO{fy}]{frr} Importing depencies, hold on.')
 try:
@@ -73,12 +65,12 @@ try:
   from src.core import *
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f'{fg2}[{fw}DEBUG{fg2}]{frr} Importing depencies took {str(s_took)} ms.')
+    pwrap(f'[INFO] Importing depencies took {str(s_took)} ms.')
   else:
-    print(f'{fy}[{fw}INFO{fy}]{frr} Depencies imported.')
+    pwrap(f'[INFO] Depencies imported.')
 except Exception as e:
-  print(f'{fr}[{fw}ERROR{fr}]{frr} Failed to import depencies, aborting.')
-  if debug: print(f'\n{fg2}[{fw}DEBUG{fg2}]{frr} Stacktrace: \n{str(e).strip()}')
+  pwrap(f'[DEBUG] Failed to import depencies, aborting.')
+  if debug: pwrap(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
 method_dict = {
@@ -94,10 +86,12 @@ method_dict = {
 }
 
 if args['target'] is None:
-  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} No target specified.')
+  pwrap(f'[ERROR] No target specified.')
+  exit()
 
 if not args['method'].upper() in method_dict.keys():
-  sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method.')
+  pwrap(f'[ERROR] Invalid method.')
+  exit()
 
 Core.bypass_cache = args['bypass_cache']
 Core.proxy_file = args['proxy_file_path']
@@ -108,15 +102,14 @@ Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
 if args['proxy'] != None and args['detect_firewall']:
-  try: yorn = input('[WARN] Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  try: yorn = pwrap('[INPUT] Detecting firewalls will leak the host lookup, are you sure you want to continue?', inp=True).upper()
   except: exit()
 
   if yorn.startswith('N'): args['detect_firewall'] = False
-  else: print('Alright, i warned ya!')
+  else: pwrap('Alright, i warned ya!')
   time.sleep(2) # a small timeout if the user reconsiders his choice
 
 init(autoreset=True) # initialize console
-print_lock = threading.Lock() # creates a "lock" variable
 
 def main():
   print('')
@@ -140,7 +133,7 @@ def main():
     print(f' Proxy type: [{str(args["proxy_type"])}]')
     if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
     if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
-    
+
   elif args['proxy_file_path'] != None:
 
     with open(args['proxy_file_path'], buffering=(2048*2048)) as fd:
@@ -178,8 +171,9 @@ def attack():
 
       sessobj = scraper
     else: 
-      print('failed to get cookies'); os.kill(os.getpid(), 9)
-  elif args['method'] == 'PROXY':
+      pwrap('Failed to get cookies'); os.kill(os.getpid(), 9)
+      
+  elif args['method'] == 'PROXY': # define the proxy type as session object (saves me some lines to code)
     sessobj = socks.SOCKS4 if 'SOCKS4' in Core.proxy_type else socks.HTTP if 'HTTP' in Core.proxy_type else socks.SOCKS5
   else:
     pass
@@ -236,17 +230,16 @@ if __name__ == '__main__':
         req_fail = str(workervalue['req_fail'])
         req_total = str(workervalue['req_total'])
 
-        with print_lock:
-          print(f'{fy}[{fw}INFO{fy}] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
+        pwrap(f'[INFO] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
     
       # calculate results
-      total_req_sent, total_req_fail, total_req = 0,0,0
+      total_req_sent, total_req_fail, total_req = 0,0,0 # set it to 0
       for workerkey, workervalue in Core.infodict.items():
         total_req_sent += workervalue['req_sent']
         total_req_fail += workervalue['req_fail']
         total_req += workervalue['req_total']
 
-      print(f'\n{fy}[{fw}INFO{fy}]{frr} Results: ')
+      pwrap(f'\n[INFO] Results: ')
       print(f'   - Requests sent: {str(total_req_sent)}')
       print(f'   - Requests failed: {str(total_req_fail)}')
       print(f'   - Requests total: {str(total_req)}')

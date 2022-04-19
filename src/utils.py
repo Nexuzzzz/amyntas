@@ -1,16 +1,18 @@
 # import modules
-import os, requests, socket, time
+import os, requests, socket, time, sys
 from random import randint, choice, shuffle, random
 from string import ascii_letters, digits, ascii_uppercase
 from netaddr import IPAddress, IPNetwork
 from urllib.parse import urlparse
 from src.core import *
 import undetected_chromedriver as webdriver
+from colorama import Fore
 #from selenium import webdriver
 #from selenium.webdriver.firefox.options import Options as ffOptions
 #from selenium.webdriver.chrome.options import Options as chrOptions
 #from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
+# load all files
 ualist = []
 with open('src/lists/useragents.txt', 'r', buffering=(2048*2048)) as uafile:
     [ualist.append(line.strip('\n')) for line in uafile.readlines()]
@@ -30,6 +32,33 @@ with open('src/lists/keywords.txt', 'r', buffering=(2048*2048)) as kwfile:
 cf_ips = []
 with open('src/lists/cf_ips.txt', 'r', buffering=(2048*2048)) as cffile:
     [cf_ips.append(line.rstrip()) for line in cffile.readlines()]
+
+# define some basic colors
+fr = Fore.RED
+fy = Fore.YELLOW
+fw = Fore.WHITE
+fg = Fore.GREEN
+fg2 = Fore.LIGHTBLACK_EX
+frr = Fore.RESET
+flc = Fore.LIGHTCYAN_EX
+flr = Fore.LIGHTRED_EX
+fc = Fore.CYAN
+
+def pwrap(text, inp):
+    for x,y in [
+        ('[INFO]',  f'{fy}[{frr}:{fy}INFO{frr}:{fy}]{frr}'),
+        ('[WARN]', f'{flc}[{frr}:{flc}WARN{frr}:{flc}]{frr}'),
+        ('[ERROR]', f'{flr}[{frr}:{flr}ERROR{frr}:{flr}]{frr}'),
+        ('[INPUT]', f'{fc}[{frr}:{fc}INPUT{frr}:{fc}]{frr}')
+    ]:
+        text=text.replace(x,y)
+
+    if not inp:
+        with Core.print_lock:
+            print(text)
+    else:
+        try: return input(text)
+        except KeyboardInterrupt: sys.exit('\n\n')
 
 def get_cookie(url):
     '''

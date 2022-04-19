@@ -6,20 +6,21 @@ The webdrivers used for the <strong>Browser Emulation</strong> attack are Window
 --- 
 
 ### About
-Amyntas is a layer 7 DoS toolkit, with a wide variety of attack methods and the capability to bypass caching systems. <br>
+Amyntas is a layer 7 DoS toolkit, with a variety of attack methods and the capability to bypass caching systems. <br>
 Use at your own risk! I, the author, am not responsible for any harm you do! Keep that in mind!
 
 <br>
 
 Aviable methods
-- GET (simple GET flood)
-- HEAD (simple HEAD flood)
-- POST (simple POST flood)
-- FAST (a <strong>GET /</strong> flood)
-- GHP/GETHEADPOST (a flood which randomly chooses GET, HEAD or POST as request method)
-- LEECH (a low & slow HTTP GET flood which can drain A LOT of bandwith)
-- MIX (a method which randomly chooses HTTP request methods)
-- BYPASS (bypasses cloudflare)
+- `GET` (simple GET flood)
+- `HEAD` (simple HEAD flood)
+- `POST` (simple POST flood)
+- `FAST` (a <strong>GET /</strong> flood)
+- `GHP`/`GETHEADPOST` (a flood which randomly chooses GET, HEAD or POST as request method)
+- `LEECH` (a low & slow HTTP GET flood which can drain A LOT of bandwith)
+- `MIX` (a method which randomly chooses HTTP request methods)
+- `BYPASS` (bypasses cloudflare)
+- `PROXY` (attack which uses a proxy file to attack)
 
 ---
 

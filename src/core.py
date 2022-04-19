@@ -1,4 +1,5 @@
 # core file, used for storing variables for bidirectional usage
+from threading import Lock
 
 class Core:
     infodict = {} # dictionary that holds information about tasks
@@ -10,6 +11,8 @@ class Core:
     attack_clear_to_go = False # used to check attack launch
     avg_rps = 0.0 # average rps counter
     #browser_type = 'FIREFOX' # browser type
+
+    print_lock = Lock() # creates a "lock" variable
 
     proxy_file = None
     proxy = None
