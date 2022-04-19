@@ -5,3 +5,4 @@ netaddr
 cloudscraper
 selenium
 undetected_chromedriver
+pysocks

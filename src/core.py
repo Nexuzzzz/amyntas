@@ -11,11 +11,14 @@ class Core:
     avg_rps = 0.0 # average rps counter
     #browser_type = 'FIREFOX' # browser type
 
+    proxy_file = None
     proxy = None
     proxy_type = 'SOCKS5'
     proxy_user = None
     proxy_passw = None
     proxy_resolve = True
+
+    proxy_pool = []
 
     bypass_useragent = None
     bypass_cookieJAR = None

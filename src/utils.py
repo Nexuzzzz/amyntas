@@ -12,23 +12,23 @@ import undetected_chromedriver as webdriver
 #from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 ualist = []
-with open('src/lists/useragents.txt', 'r') as uafile:
+with open('src/lists/useragents.txt', 'r', buffering=(2048*2048)) as uafile:
     [ualist.append(line.strip('\n')) for line in uafile.readlines()]
 
 reflist = []
-with open('src/lists/referers.txt', 'r') as reffile:
+with open('src/lists/referers.txt', 'r', buffering=(2048*2048)) as reffile:
     [reflist.append(line.strip('\n')) for line in reffile.readlines()]
 
 orlist = []
-with open('src/lists/open redirects.txt', 'r') as orfile:
+with open('src/lists/open redirects.txt', 'r', buffering=(2048*2048)) as orfile:
     [orlist.append(line.strip('\n')) for line in orfile.readlines()]
 
 keywords = []
-with open('src/lists/keywords.txt', 'r') as kwfile:
+with open('src/lists/keywords.txt', 'r', buffering=(2048*2048)) as kwfile:
     [keywords.append(line.strip('\n')) for line in kwfile.readlines()]
 
 cf_ips = []
-with open('src/lists/cf_ips.txt', 'r') as cffile:
+with open('src/lists/cf_ips.txt', 'r', buffering=(2048*2048)) as cffile:
     [cf_ips.append(line.rstrip()) for line in cffile.readlines()]
 
 def get_cookie(url):
