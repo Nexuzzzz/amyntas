@@ -44,22 +44,6 @@ flc = Fore.LIGHTCYAN_EX
 flr = Fore.LIGHTRED_EX
 fc = Fore.CYAN
 
-def pwrap(text, inp):
-    for x,y in [
-        ('[INFO]',  f'{fy}[{frr}:{fy}INFO{frr}:{fy}]{frr}'),
-        ('[WARN]', f'{flc}[{frr}:{flc}WARN{frr}:{flc}]{frr}'),
-        ('[ERROR]', f'{flr}[{frr}:{flr}ERROR{frr}:{flr}]{frr}'),
-        ('[INPUT]', f'{fc}[{frr}:{fc}INPUT{frr}:{fc}]{frr}')
-    ]:
-        text=text.replace(x,y)
-
-    if not inp:
-        with Core.print_lock:
-            print(text)
-    else:
-        try: return input(text)
-        except KeyboardInterrupt: sys.exit('\n\n')
-
 def get_cookie(url):
     '''
     Gets CF cookie, which is basically a entry ticket

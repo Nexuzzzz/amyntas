@@ -48,16 +48,16 @@ try:
   from requests.cookies import RequestsCookieJar
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    print(f'{Fore.LIGHTBLACK_EX}[{Fore.WHITE}DEBUG{Fore.LIGHTBLACK_EX}]{Fore.RESET} Importing modules took {str(s_took)} ms.')
+    print(f'[DEBUG] Importing modules took {str(s_took)} ms.')
   else:
-    print(f'{Fore.YELLOW}[{Fore.WHITE}INFO{Fore.YELLOW}]{Fore.RESET} Modules imported.')
+    print(f'[INFO] Modules imported.')
 except Exception as e:
   print('[ERROR] Failed to import modules, aborting. Please consider "pip install -r requirements.txt"')
   if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
 # Import depencies
-print(f'{fy}[{fw}INFO{fy}]{frr} Importing depencies, hold on.')
+print(f'[INFO] Importing depencies, hold on.')
 try:
   if debug: s_start = timer()
   from src.utils import *
@@ -65,12 +65,12 @@ try:
   from src.core import *
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
-    pwrap(f'[INFO] Importing depencies took {str(s_took)} ms.')
+    print(f'[INFO] Importing depencies took {str(s_took)} ms.')
   else:
-    pwrap(f'[INFO] Depencies imported.')
+    print(f'[INFO] Depencies imported.')
 except Exception as e:
-  pwrap(f'[DEBUG] Failed to import depencies, aborting.')
-  if debug: pwrap(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
+  print(f'[DEBUG] Failed to import depencies, aborting.')
+  if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
   exit()
 
 method_dict = {
@@ -86,11 +86,11 @@ method_dict = {
 }
 
 if args['target'] is None:
-  pwrap(f'[ERROR] No target specified.')
+  print(f'[ERROR] No target specified.')
   exit()
 
 if not args['method'].upper() in method_dict.keys():
-  pwrap(f'[ERROR] Invalid method.')
+  print(f'[ERROR] Invalid method.')
   exit()
 
 Core.bypass_cache = args['bypass_cache']
@@ -102,11 +102,11 @@ Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
 if args['proxy'] != None and args['detect_firewall']:
-  try: yorn = pwrap('[INPUT] Detecting firewalls will leak the host lookup, are you sure you want to continue?', inp=True).upper()
+  try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
   except: exit()
 
   if yorn.startswith('N'): args['detect_firewall'] = False
-  else: pwrap('Alright, i warned ya!')
+  else: print('Alright, i warned ya!')
   time.sleep(2) # a small timeout if the user reconsiders his choice
 
 init(autoreset=True) # initialize console
@@ -171,7 +171,7 @@ def attack():
 
       sessobj = scraper
     else: 
-      pwrap('Failed to get cookies'); os.kill(os.getpid(), 9)
+      print('Failed to get cookies'); os.kill(os.getpid(), 9)
       
   elif args['method'] == 'PROXY': # define the proxy type as session object (saves me some lines to code)
     sessobj = socks.SOCKS4 if 'SOCKS4' in Core.proxy_type else socks.HTTP if 'HTTP' in Core.proxy_type else socks.SOCKS5
@@ -230,7 +230,7 @@ if __name__ == '__main__':
         req_fail = str(workervalue['req_fail'])
         req_total = str(workervalue['req_total'])
 
-        pwrap(f'[INFO] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
+        print(f'[INFO] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
     
       # calculate results
       total_req_sent, total_req_fail, total_req = 0,0,0 # set it to 0
@@ -239,15 +239,18 @@ if __name__ == '__main__':
         total_req_fail += workervalue['req_fail']
         total_req += workervalue['req_total']
 
-      pwrap(f'\n[INFO] Results: ')
+      print(f'\n[INFO] Results: ')
       print(f'   - Requests sent: {str(total_req_sent)}')
       print(f'   - Requests failed: {str(total_req_fail)}')
       print(f'   - Requests total: {str(total_req)}')
     except Exception:
      Core.attackrunning = False
     
-    time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
-    if Core.attackrunning: 
-      clear()
+    try:
+      time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
+      if Core.attackrunning: 
+        clear()
+    except:
+      exit()
   
   print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}'))

