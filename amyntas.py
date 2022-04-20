@@ -136,8 +136,11 @@ def main():
 
   elif args['proxy_file_path'] != None:
 
-    with open(args['proxy_file_path'], buffering=(2048*2048)) as fd:
-      [Core.proxy_pool.append(x.rstrip()) for x in fd.readlines()]
+    if os.path.isfile(args['proxy_file_path']):
+      with open(args['proxy_file_path'], buffering=(2048*2048)) as fd:
+        [Core.proxy_pool.append(x.rstrip()) for x in fd.readlines()]
+    else:
+      sys.exit(f' Could not find file: [{args["proxy_file_path"]}]')
 
     print(f' Proxy file path: [{args["proxy_file_path"]}]')
     print(f' Proxies loaded: [{str(len(Core.proxy_pool))}]')

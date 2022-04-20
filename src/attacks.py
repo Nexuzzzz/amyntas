@@ -275,6 +275,8 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     while time.time() < stoptime and Core.attackrunning:
         try:
             s = socks.socksocket()
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
             s.settimeout(3)
 
             if port == 443: # ssl
