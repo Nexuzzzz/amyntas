@@ -256,4 +256,4 @@ if __name__ == '__main__':
     except:
       exit()
   
-  print(f'   - Average requests per second: '+str(Core.avg_rps).replace('.', f'.{fg2}'))
+  print(f'   - Average requests per second: {str(Core.avg_rps)}')
