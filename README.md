@@ -65,6 +65,7 @@ All options:
 -bc, --bypass-cache                    Bypass the cache of the site
 -m METHOD, --method METHOD             Method to use when attacking (default: GET)
 -dfw, --detect-firewall                Detect if the target site is protected by a firewall
+--http-version HTTP_VERSION            Set the HTTP protocol version (default: 1.1)
 ```
 
 Basic usage:
@@ -84,7 +85,12 @@ python3 amyntas.py -t https://target.com -w 700 -m POST -d 40
 
 Proxified GET flood using a file with SOCKS5 proxies, with 1337 threads for 40 seconds
 ```
-python3 amyntas.py --proxy-file socks5.txt --proxy-type SOCKS5 -t https://target.com -w 1337 -d 40
+python3 amyntas.py --proxy-file socks5.txt --proxy-type SOCKS5 -t https://target.com -w 1337 -d 40 -m PROXY
+```
+
+Raw GET flood, using HTTP protocol 430 with 999 threads for 999 seconds
+```
+python3 amyntas.py --http-version 430 -m GET -w 999 -d 999 -t https://target.com:420
 ```
 
 ---
@@ -99,4 +105,12 @@ netaddr
 cloudscraper
 selenium
 undetected_chromedriver
+ssl
 ```
+
+---
+
+### Images
+<p>3.8k GET flood using 2300 threads</p>
+
+![image](https://user-images.githubusercontent.com/78029616/164300794-c4b850ba-37d0-41e0-a62f-53f7578ff731.png)
