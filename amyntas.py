@@ -233,7 +233,7 @@ if __name__ == '__main__':
         req_fail = str(workervalue['req_fail'])
         req_total = str(workervalue['req_total'])
 
-        print(f'[INFO] [{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
+        print(f'[INFO] {fy}[{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}')
     
       # calculate results
       total_req_sent, total_req_fail, total_req = 0,0,0 # set it to 0
