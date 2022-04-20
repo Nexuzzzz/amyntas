@@ -96,7 +96,7 @@ if not args['method'].upper() in method_dict.keys():
 Core.bypass_cache = args['bypass_cache']
 Core.proxy_file = args['proxy_file_path']
 Core.proxy = args['proxy']
-Core.proxy_type = args['proxy_type']
+Core.proxy_type = args['proxy_type'].upper() # this here fixed the issue for IP leaks when using lowercase proxy types, eg; http instead of HTTP
 Core.proxy_user = args['proxy_user']
 Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
