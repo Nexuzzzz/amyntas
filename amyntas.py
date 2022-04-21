@@ -106,7 +106,7 @@ Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
 
 if args['proxy'] != None and args['detect_firewall']:
-  try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue?').upper()
+  try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue? ').upper()
   except: exit()
 
   if yorn.startswith('N'): args['detect_firewall'] = False
@@ -237,9 +237,12 @@ if __name__ == '__main__':
         req_fail = str(workervalue['req_fail'])
         req_total = str(workervalue['req_total'])
 
-        with Core.print_lock: # prevents lines from printing over eachother
-          sys.stdout.write(f'[INFO] {fy}[{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}\n\r')
-          sys.stdout.flush()
+        try:
+          with Core.print_lock: # prevents lines from printing over eachother
+            sys.stdout.write(f'[INFO] {fy}[{fw}worker{frr}-{fw}{workerkey}{fy}]{frr} {fg}req_sent{frr}={req_sent} {fr}req_fail{frr}={req_fail} {fy}req_total{frr}={req_total} {fy}thread_count{frr}={str(Core.threadcount)}\n\r')
+            sys.stdout.flush()
+        except:
+          Core.attackrunning = False; break
 
       # calculate results
       total_req_sent, total_req_fail, total_req = 0,0,0 # set it to 0
@@ -253,7 +256,7 @@ if __name__ == '__main__':
       print(f'   - Requests failed: {str(total_req_fail)}')
       print(f'   - Requests total: {str(total_req)}')
     except Exception:
-     Core.attackrunning = False
+     Core.attackrunning = False; break
     
     try:
       time.sleep(2 if attack_method.upper() != 'LEECH' else 10)
