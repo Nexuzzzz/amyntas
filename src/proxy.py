@@ -137,6 +137,7 @@ def get(proto=5):
 			'https://api.openproxylist.xyz/socks5.txt',
 			'https://www.freeproxychecker.com/result/socks5_proxies.txt',
             'http://worm.rip/socks5.txt',
+            'https://alexa.lr2b.com/socks5.txt',
             'https://raw.githubusercontent.com/ryanhaticus/superiorproxy.com/main/proxies.txt',
             'https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt',
             'https://raw.githubusercontent.com/hookzof/socks5_list/master/proxy.txt',

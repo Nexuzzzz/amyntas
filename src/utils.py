@@ -153,8 +153,7 @@ def isCF(ip): # credits to Wreckuests
     '''
 
     for i in cf_ips:
-        if (IPAddress(ip) in IPNetwork(i)):
-            return True
+        return (IPAddress(ip) in IPNetwork(i))
 
 def calcbestworkers():
     ''' 
