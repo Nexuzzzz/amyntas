@@ -1,6 +1,6 @@
 import requests, json, re
 
-def get(proto=5):
+def scrape(proto=5):
     urls, proxlist = [],[]
     if proto == 0: # HTTP
         urls = [
@@ -171,6 +171,8 @@ def get(proto=5):
 
             if 'socks5' in ptype.lower():
                 proxlist.append(f'{ip}:{port}')
+    else:
+        return []
     
     for url in urls:
         try:

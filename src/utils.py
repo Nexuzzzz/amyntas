@@ -67,6 +67,7 @@ def get_cookie(url):
     for argument in arguments:
         options.add_argument(argument)
 
+    print('[BYPASS] Launching browser')
     driver = webdriver.Chrome(options=options, driver_executable_path='src\\drivers\\chromedriver.exe')
     driver.implicitly_wait(3)
     driver.get(url)
@@ -234,9 +235,10 @@ def buildblock(url):
     '''
     Function to generate a block that gets appened to the target url
     '''
-    
+    if url is None: return ''
+    block = '' if url.endswith('/') else '/'
+
     if Core.bypass_cache:
-        block = '' if url != None and url.endswith('/') else '/' if url != None and not url.endswith('/') else ''
 
         block += randstr(randint(5, 10))
         for _ in range(randint(2, 10)):
@@ -258,46 +260,56 @@ def buildheaders(url, useragent, referer):
     Function to generate randomized headers
     '''
 
-    reflist.append(url+buildblock(url))
+    reflist.append(url+buildblock(url)) # append the target url to the referer list itself
 
-    cache_controls = ['no-cache', 'max-age=0']
-    accept_encodings = ['*', 'identity', 'gzip', 'deflate']
-    accept_charsets = ['ISO-8859-1', 'utf-8', 'Windows-1251', 'ISO-8859-2', 'ISO-8859-15']
+    cache_controls = ['no-cache', 'max-age=0', 'no-store', 'no-transform', 'only-if-cached', 'must-revalidate', 'no-transform'] if not Core.bypass_cache else ['no-store', 'no-cache', 'no-transform']
+    accept_encodings = ['*', 'identity', 'gzip', 'deflate', 'compress', 'br']
+    accept_langs = ['*', 'en-US', 'fr', 'nl-BE', 'nl', 'de', 'de-CH', 'en', 'fr-CH', '*;q=0.5', 'fr-CA', 'sr-Latn']
     content_types = ['multipart/form-data', 'application/x-url-encoded']
-    accepts = ['*/*', 'application/json', 'text/html', 'application/xhtml+xml', 'application/xml', 'image/webp', 'image/*']
+    accepts = ['text/plain', '*/*', '/', 'application/json', 'text/html', 'application/xhtml+xml', 'application/xml', 'image/webp', 'image/*', 'image/jpeg', 'application/x-ms-application', 'image/gif', 'application/xaml+xml', 'image/pjpeg', 'application/x-ms-xbap', 'application/x-shockwave-flash', 'application/msword']
+
     # we shuffle em
-    for toshuffle in [cache_controls, accept_encodings, accept_charsets, content_types, accepts]:
+    for toshuffle in [cache_controls, accept_encodings, content_types, accepts]:
         shuffle(toshuffle)
     
-    if randint(0,1) == 1: headers = { 'X-Requested-With': 'XMLHttpRequest'}
-    else: headers = { 'User-Agent': choice(ualist) if useragent == None else useragent }
+    headers = choice([ # chooses between XMLHttpRequest and a random/predefined useragent
+        {'User-Agent': None, 'X-Requested-With': 'XMLHttpRequest'}, 
+        {'User-Agent': choice(ualist) if useragent == None else useragent}
+    ])
 
-    headers.update({
+    headers.update({ # default headers
+        'X-Forwarded-Proto': 'Http',
+        'X-Forwarded-Host': f'{urlparse(url).netloc}, 1.1.1.1',
         'Cache-Control': ', '.join(cache_controls[:randint(1,len(cache_controls))]),
         'Accept-Encoding': ', '.join(accept_encodings[:randint(1,len(accept_encodings))]),
-        'Accept': ', '.join(accepts[:randint(1,len(accepts))])
+        'Accept': ', '.join(accepts[:randint(1,len(accepts))]),
+        'Accept-Language':  ','.join(accept_langs[:randint(1,len(accept_langs))]),
     })
 
-    # "random" headers
-    if randint(0,1) == 1:
-        charsets = f'{accept_charsets[0]},{accept_charsets[1]};q={str(round(random(), 1))},*;q={str(round(random(), 1))}'
-        headers.update({'Accept-Charset': charsets})
-
-    if randint(0,1) == 1:
+    if randint(0,1) == 1: # referer
         rand_referer = choice(reflist)
         headers.update({'Referer': rand_referer+buildblock(rand_referer) if referer == None else referer})
     
-    if randint(0,1) == 1:
-        headers.update({'Content-Type': choice(content_types)})
+    if randint(0,1) == 1: # cookie
+        headers.update({'Cookie': choice([
+            randstr(randint(60, 90), chars=ascii_uppercase+str(digits)),
+            f'id={randstr(randint(2,5))}',
+            f'PHPSESSID={randstr(randint(50,60))}; csrftoken={randstr(randint(4,20))}; _gat=1',
+            f'cf_chl_2={randstr(randint(4,20))}; cf_chl_prog=x11; cf_clearance={randstr(randint(30,50))}',
+            f'__cf_bm={randstr(randint(100,200))}; __cf_bm={randstr(randint(100,200))}',
+            f'language=en; AKA_A2=A; AMCVS_3AE7BD6E597F48940A495ED0%40AdobeOrg={str(randint(0,1))}; AMCV_{randstr(randint(20,60))}={randstr(randint(50,100))}; ak_bmsc={randstr(randint(50,100), chars=ascii_uppercase)}~{randstr(randint(200,600))}'
+        ])})
     
-    if randint(0,1) == 1:
-        headers.update({'Cookie': randstr(randint(60, 90), chars=ascii_uppercase+str(digits))})
+    #if randint(0,1) == 1: # viewport
+    #    headers.update({'viewport-width': str(randint(100, 300))})
     
-    if randint(0,1) == 1:
+    if randint(0,1) == 1: # "fake" ip
         spoofip = randip()
         headers.update({
             'Via': spoofip,
-            'X-Forwarded-For': spoofip
+            'Client-IP': spoofip,
+            'X-Forwarded-For': spoofip,
+            'Real-IP': spoofip
         })
     
     return headers
