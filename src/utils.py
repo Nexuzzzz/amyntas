@@ -44,6 +44,18 @@ flc = Fore.LIGHTCYAN_EX
 flr = Fore.LIGHTRED_EX
 fc = Fore.CYAN
 
+def giveproxy():
+    proxip, proxport = choice(Core.proxy_pool).split(':')
+    proxy = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{proxip}:{proxport}'
+
+    return {'http': proxy, 'https': proxy}
+
+def checkproxy(proxy, proto):
+    try:
+        requests.get(choice(['https://google.com','https://yandex.ru','https://cloudflare.com','https://stackoverflow.com','https://github.com','https://pastebin.com']), proxies={'http': f'{proto}://{proxy}', 'https': f'{proto}://{proxy}'}, timeout=(2,2), verify=False, allow_redirects=False)
+        return True
+    except: return False
+
 def get_cookie(url):
     '''
     Gets CF cookie, which is basically a entry ticket
