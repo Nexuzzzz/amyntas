@@ -1,6 +1,59 @@
-import requests, json, re
+import requests, json, re, threading
+from src.core import Core
+from src.utils import *
 
-def scrape(proto=5):
+def giveproxy():
+    if Core.proxy_rotate:
+        proxip, proxport = choice(Core.proxy_pool).split(':')
+        proxy = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{proxip}:{proxport}'
+    else: proxy = None
+
+    return {'http': proxy, 'https': proxy}
+
+def checkproxy(proxy, proto):
+    try:
+        req = requests.get(
+            choice(['https://www.google.com','https://stackoverflow.com','https://pastebin.com']), 
+            proxies={'http': f'{proto}://{proxy}', 'https': f'{proto}://{proxy}'}, 
+            timeout=10, 
+            verify=False, 
+            allow_redirects=True
+        )
+        return True
+    except Exception: return False
+
+def checkthread(good, bad, proxy):
+    response = checkproxy(proxy, Core.proxy_type.lower())
+    if response: good.write(f'{proxy}\n')
+    else: bad.write(f'{proxy}\n')
+
+def checker(file):
+    if not os.path.isfile(file):
+        sys.exit('[ERROR] Could not find file.')
+    
+    proxies = []
+    with open(file, buffering=(2048*2048)) as proxfile:
+        [proxies.append(x.rstrip()) for x in proxfile.read().split('\n') if len(x) != 0]
+
+    print('[INFO] Saving all good proxies into "good.txt" and bad proxies into "bad.txt".')
+    good, bad = open('good.txt', 'a+', buffering=(2048*2048)), open('bad.txt', 'a+', buffering=(2048*2048))
+
+    threadbox = []
+    for proxy in proxies:
+        if len(threadbox) > 200: # we allow max 200 threads to check proxies
+            time.sleep(0.5)
+
+        kaboom = threading.Thread(target=checkthread, args=(good, bad, proxy))
+        threadbox.append(kaboom)
+        kaboom.start()
+    
+    for thread in threadbox:
+        thread.join() # wait for all threads to finish
+
+    good.close(); bad.close()
+    print('[INFO] Done.')
+
+def scraper(proto=5):
     urls, proxlist = [],[]
     if proto == 0: # HTTP
         urls = [

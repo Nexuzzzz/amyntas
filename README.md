@@ -69,6 +69,7 @@ All options:
 -dfw, --detect-firewall                Detect if the target site is protected by a firewall
 --http-version HTTP_VERSION            Set the HTTP protocol version (default: 1.1)
 --scrape-proxies                       Wether to scrape a list of proxies first (set the type using `--proxy-type`)
+--check-proxies FILE_LOCATION          Specify a file with proxies to check (set type using `--proxy-type`)
 ```
 
 Basic usage:

@@ -24,6 +24,7 @@ class Core:
     proxy_passw = None
     proxy_resolve = True
     proxy_pool = []
+    proxy_rotate = False
 
     bypass_useragent = None
     bypass_cookieJAR = None

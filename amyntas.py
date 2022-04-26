@@ -80,6 +80,8 @@ except Exception as e:
     if debug: print(f'\n[DEBUG] Stacktrace: \n{str(e).strip()}')
     exit()
 
+init(autoreset=True) # initialize console
+
 method_dict = {
   'GET': http_get, # GET flood
   'POST': http_post, # POST flood
@@ -100,6 +102,7 @@ Core.proxy_type = args['proxy_type'].upper() # this here fixed the issue for IP 
 Core.proxy_user = args['proxy_user']
 Core.proxy_passw = args['proxy_pass']
 Core.proxy_resolve = args['proxy_resolve']
+Core.proxy_rotate = args['rotate_proxies']
 
 if args['scrape_proxies']:
 
@@ -108,7 +111,7 @@ if args['scrape_proxies']:
         input('Press ENTER to continue! ')
 
     print(f'\n[INFO] Scraping {Core.proxy_type} proxies.')
-    proxies = scrape({'HTTP': 0, 'SOCKS4': 4, 'SOCKS5': 5}.get(Core.proxy_type))
+    proxies = scraper({'HTTP': 0, 'SOCKS4': 4, 'SOCKS5': 5}.get(Core.proxy_type))
     print(f'[INFO] Loaded {str(len(proxies))} proxies.')
     print(f'[INFO] Saving into file: {Core.proxy_type}.txt')
 
@@ -117,24 +120,9 @@ if args['scrape_proxies']:
 
     print('[INFO] Done.')
 
+# do some checking
 if args['check_proxies_file'] != None:
-    if not os.path.isfile(args['check_proxies_file']):
-        sys.exit('[ERROR] Could not find file.')
-    
-    proxies = []
-    with open(args['check_proxies_file'], buffering=(2048*2048)) as proxfile:
-        [proxies.append(x.rstrip()) for x in proxfile.read().split('\n') if len(x) != 0]
-
-    print('[INFO] Saving all good proxies into "good.txt" and bad proxies into "bad.txt".')
-    good, bad = open('good.txt', 'a+', buffering=(2048*2048)), open('bad.txt', 'a+', buffering=(2048*2048))
-    for proxy in proxies:
-        if checkproxy(proxy, Core.proxy_type.lower()):
-            good.write(f'{proxy}\n')
-        else:
-            bad.write(f'{proxy}\n')
-    
-    good.close(); bad.close()
-    print('[INFO] Done.')
+    checker()
 
 if args['proxy'] != None and args['detect_firewall']:
     try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue? ').upper()
@@ -144,16 +132,13 @@ if args['proxy'] != None and args['detect_firewall']:
     else: print('Alright, i warned ya!')
     time.sleep(2) # a small timeout if the user reconsiders his choice so he can CTRL-C or close the tool
 
-init(autoreset=True) # initialize console
-
 if args['target'] is None:
-    print(f'[ERROR] No target specified.')
-    exit()
+    sys.exit(f'[ERROR] No target specified.')
 
 if not attack_method.upper() in method_dict.keys():
-    print(f'[ERROR] Invalid method.')
-    exit()
+    sys.exit(f'[ERROR] Invalid method.')
 
+# finally we get to the main function
 def main():
     print('')
     with open('src/banner.txt', 'r') as fd:
