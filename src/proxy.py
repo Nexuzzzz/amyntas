@@ -2,8 +2,8 @@ import requests, json, re, threading
 from src.core import Core
 from src.utils import *
 
-def giveproxy():
-    if Core.proxy_rotate:
+def giveproxy(force_give=False):
+    if Core.proxy_rotate or force_give:
         proxip, proxport = choice(Core.proxy_pool).split(':')
         proxy = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{proxip}:{proxport}'
     else: proxy = None

