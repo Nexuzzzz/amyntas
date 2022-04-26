@@ -121,8 +121,10 @@ if args['scrape_proxies']:
     print('[INFO] Done.')
 
 # do some checking
-if args['check_proxies_file'] != None:
-    checker()
+if args['check_proxies_file'] != None:  checker()
+if args['target'] is None: sys.exit(f'[ERROR] No target specified.')
+if not attack_method in method_dict.keys(): sys.exit(f'[ERROR] Invalid method.')
+if attack_method in ['BYPASS', 'PROXY'] and args['proxy_file_path'] is None: sys.exit(f'[ERROR] The "{attack_method}" method needs a proxy list!')
 
 if args['proxy'] != None and args['detect_firewall']:
     try: yorn = input('Detecting firewalls will leak the host lookup, are you sure you want to continue? ').upper()
@@ -131,12 +133,6 @@ if args['proxy'] != None and args['detect_firewall']:
     if yorn.startswith('N'): args['detect_firewall'] = False
     else: print('Alright, i warned ya!')
     time.sleep(2) # a small timeout if the user reconsiders his choice so he can CTRL-C or close the tool
-
-if args['target'] is None:
-    sys.exit(f'[ERROR] No target specified.')
-
-if not attack_method.upper() in method_dict.keys():
-    sys.exit(f'[ERROR] Invalid method.')
 
 # finally we get to the main function
 def main():

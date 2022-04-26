@@ -1,9 +1,10 @@
-import requests, json, re, threading
+import requests, json, re, threading, sys, time, os
 from src.core import Core
 from src.utils import *
+from random import choice
 
 def giveproxy(force_give=False):
-    if Core.proxy_rotate or force_give:
+    if Core.proxy_rotate or force_give and Core.proxy_pool != None or len(Core.proxy_pool) > 0:
         proxip, proxport = choice(Core.proxy_pool).split(':')
         proxy = f'{Core.proxy_type.lower()}{"h" if Core.proxy_resolve is True else ""}://{proxip}:{proxport}'
     else: proxy = None
@@ -13,7 +14,7 @@ def giveproxy(force_give=False):
 def checkproxy(proxy, proto):
     try:
         req = requests.get(
-            choice(['https://www.google.com','https://stackoverflow.com','https://pastebin.com']), 
+            choice(['https://www.google.com','https://stackoverflow.com','https://pastebin.com','https://github.com']), 
             proxies={'http': f'{proto}://{proxy}', 'https': f'{proto}://{proxy}'}, 
             timeout=10, 
             verify=False, 
