@@ -325,7 +325,7 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent=None, re
             s = socks.socksocket()
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
-            s.setsockopt(socket.SOL_SOCKET, socket.SOL_LINGER,1,0) # throws way any data when the connection closes
+            s.setsockopt(socket.SOL_SOCKET, socket.SOL_LINGER,1) # throws way any data when the connection closes
             s.settimeout(4)
 
             s.set_proxy(proto, str(proxip), int(proxport))
