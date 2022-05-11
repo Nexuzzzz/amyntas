@@ -3,6 +3,10 @@ from src.core import Core
 from src.utils import *
 from random import choice
 
+# disable "InsecureRequestWarning"'s
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 def giveproxy(force_give=False):
     if Core.proxy_rotate or force_give and Core.proxy_pool != None or len(Core.proxy_pool) > 0:
         proxip, proxport = choice(Core.proxy_pool).split(':')
@@ -11,51 +15,96 @@ def giveproxy(force_give=False):
 
     return {'http': proxy, 'https': proxy}
 
-def checkproxy(proxy, proto):
+def checkproxy(proxy):
     try:
-        req = requests.get(
-            choice(['https://www.google.com','https://stackoverflow.com','https://pastebin.com','https://github.com']), 
-            proxies={'http': f'{proto}://{proxy}', 'https': f'{proto}://{proxy}'}, 
-            timeout=10, 
-            verify=False, 
-            allow_redirects=True
-        )
-        return True
-    except Exception: return False
+        proto = Core.proxy_type.lower()
+        requests.get(
+            choice([
+                'https://api.ipify.org/?format=text',
+                'https://myexternalip.com/raw',
+                'https://wtfismyip.com/text',
+                'https://icanhazip.com/',
+                'https://ipv4bot.whatismyipaddress.com/',
+                'https://ip4.seeip.org',
+                'https://checkip.amazonaws.com/',
+                'https://l2.io/ip',
+            ]), 
 
-def checkthread(good, bad, proxy):
-    response = checkproxy(proxy, Core.proxy_type.lower())
-    if response: good.write(f'{proxy}\n')
-    else: bad.write(f'{proxy}\n')
+            proxies={
+                'http': f'{proto}://{proxy}', 
+                'https': f'{proto}://{proxy}'
+            }, 
+
+            headers = {
+                'User-Agent': choice(ualist)
+            },
+
+            timeout=(10,6), 
+            verify=False, 
+            allow_redirects=False,
+            stream=False
+        )
+
+        return True # no errors, request sent!
+    except requests.exceptions.ConnectionError or \
+         requests.exceptions.ConnectTimeout: return False
+
+threadcount = 0
+def checkthread(lock, proxy):
+    global threadcount
+
+    response = checkproxy(proxy)
+
+    with lock:
+        with open('good.txt' if response else 'bad.txt', 'a+', buffering=(16*1024*1024)) as fd:
+            fd.write(f'{proxy}\n')
+    
+    threadcount -= 1
 
 def checker(file):
+    global threadcount
+
     if not os.path.isfile(file):
         sys.exit('[ERROR] Could not find file.')
     
     proxies = []
-    with open(file, buffering=(2048*2048)) as proxfile:
+    with open(file, buffering=(16*1024*1024)) as proxfile:
         [proxies.append(x.rstrip()) for x in proxfile.read().split('\n') if len(x) != 0]
 
+    print(f'[INFO] Parsed "{str(len(proxies))}" proxies from {file}')
     print('[INFO] Saving all good proxies into "good.txt" and bad proxies into "bad.txt".')
-    good, bad = open('good.txt', 'a+', buffering=(2048*2048)), open('bad.txt', 'a+', buffering=(2048*2048))
 
-    threadbox = []
+    box, lock, stop = [], threading.Lock(), False
     for proxy in proxies:
-        if len(threadbox) > 200: # we allow max 200 threads to check proxies
-            time.sleep(0.5)
+        while not stop:
+            try:
+                if threadcount >= 555: # we allow max 555 threads to check proxies
+                    time.sleep(0.01); continue
 
-        kaboom = threading.Thread(target=checkthread, args=(good, bad, proxy))
-        threadbox.append(kaboom)
-        kaboom.start()
+                kaboom = threading.Thread(target=checkthread, args=(lock, proxy,))
+
+                threadcount += 1
+                box.append(kaboom)
+
+                kaboom.start()
+
+                print(f'Launched thread for --> {str(proxy)}')
+
+                break # skip to next proxy
+            except KeyboardInterrupt: stop=True # fully shut down
+            except Exception: pass
+        
+        if stop: break
     
-    for thread in threadbox:
+    print('[INFO] Launched all threads')
+    
+    for thread in box:
         thread.join() # wait for all threads to finish
-
-    good.close(); bad.close()
+    
     print('[INFO] Done.')
 
 def scraper(proto=5):
-    urls, proxlist = [],[]
+    urls, proxlist, protodict = [],[], {0:'http',4:'socks4',5:'socks5'}
     if proto == 0: # HTTP
         urls = [
             'http://worm.rip/http.txt',
@@ -90,40 +139,10 @@ def scraper(proto=5):
             'http://nntime.com/',
             'https://www.us-proxy.org/',
             'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/http.txt',
-            'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt'
+            'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt',
+            'https://raw.githubusercontent.com/Volodichev/proxy-list/main/http.txt',
+            'https://raw.githubusercontent.com/Volodichev/proxy-list/main/http_old.txt'
         ]
-
-        page = requests.get('http://proxylist.fatezero.org/proxy.list')
-        for line in page.text.splitlines():
-            line = json.loads(line)
-            if 'http' in line['type'].lower():
-                try: proxlist.append(f'{line["host"]}:{str(line["port"])}')
-                except Exception: pass
-
-        page = requests.get('https://hidemy.name/en/proxy-list/#list', headers={'User-Agent': 'not-requests/xd'})
-        part = page.text.split("<tbody>")[1].split("</tbody>")[0].split("<tr><td>")
-
-        for line in part:
-            proxtype = None
-            line = line.replace('</td><td>', ':')
-            found = re.findall(r'</div></div>:(.*?):', line)
-
-            if found != None and len(found) != 0: proxtype = found[0]
-            else: continue # we skip
-
-            if 'http' in proxtype.lower():
-                proxy = ':'.join(line.split(':', 2)[:2]).rstrip()
-                if proxy != None and len(proxy) != 0 and proxy != '' and bool(re.match(r'\d+\.\d+\.\d+\.\d+\:\d+', proxy)): # skips empty/invalid proxies
-                    try: proxlist.append(proxy)
-                    except: pass
-        
-        page = requests.get('https://scrapingant.com/proxies').text
-        for line in re.findall(r'<tr><td>\d+\.\d+\.\d+\.\d+<\/td><td>\d+<\/td><td>.*?<\/td>', page):
-            line=line.replace('<tr><td>','').replace('</td>','')
-            ip,port,ptype = line.split('<td>')
-
-            if 'http' in ptype.lower():
-                proxlist.append(f'{ip}:{port}')
 
     elif proto == 4: # SOCKS4
         urls = [
@@ -153,31 +172,6 @@ def scraper(proto=5):
 
             try: proxlist.append(f'{proxy[0]}:{proxy[1]}\n')
             except: pass
-        
-        page = requests.get('https://hidemy.name/en/proxy-list/#list', headers={'User-Agent': 'not-requests/xd'})
-        part = page.text.split("<tbody>")[1].split("</tbody>")[0].split("<tr><td>")
-
-        for line in part:
-            proxtype = None
-            line = line.replace('</td><td>', ':')
-            found = re.findall(r'</div></div>:(.*?):', line)
-
-            if found != None and len(found) != 0: proxtype = found[0]
-            else: continue
-
-            if 'socks4' in proxtype.lower():
-                proxy = ':'.join(line.split(':', 2)[:2]).rstrip()
-                if proxy != None and len(proxy) != 0 and proxy != '' and bool(re.match(r'\d+\.\d+\.\d+\.\d+\:\d+', proxy)):
-                    try: proxlist.append(proxy)
-                    except: pass
-        
-        page = requests.get('https://scrapingant.com/proxies').text
-        for line in re.findall(r'<tr><td>\d+\.\d+\.\d+\.\d+<\/td><td>\d+<\/td><td>.*?<\/td>', page):
-            line=line.replace('<tr><td>','').replace('</td>','')
-            ip,port,ptype = line.split('<td>')
-
-            if 'socks4' in ptype.lower():
-                proxlist.append(f'{ip}:{port}')
     
     elif proto == 5: # SOCKS5
         urls = [
@@ -200,39 +194,61 @@ def scraper(proto=5):
             'http://proxydb.net/?protocol=socks4&protocol=socks5&anonlvl=1&anonlvl=2&anonlvl=3&anonlvl=4&country=',
             'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/socks5.txt'
         ]
-
-        page = requests.get('https://hidemy.name/en/proxy-list/#list', headers={'User-Agent': 'not-requests/xd'})
-        part = page.text.split("<tbody>")[1].split("</tbody>")[0].split("<tr><td>")
-
-        for line in part:
-            proxtype = None
-            line = line.replace('</td><td>', ':')
-            found = re.findall(r'</div></div>:(.*?):', line)
-
-            if found != None and len(found) != 0: proxtype = found[0]
-            else: continue
-
-            if 'socks5' in proxtype.lower():
-                proxy = ':'.join(line.split(':', 2)[:2]).rstrip()
-                if proxy != None and len(proxy) != 0 and proxy != '' and bool(re.match(r'\d+\.\d+\.\d+\.\d+\:\d+', proxy)):
-                    try: proxlist.append(proxy)
-                    except: pass
-        
-        page = requests.get('https://scrapingant.com/proxies').text
-        for line in re.findall(r'<tr><td>\d+\.\d+\.\d+\.\d+<\/td><td>\d+<\/td><td>.*?<\/td>', page):
-            line=line.replace('<tr><td>','').replace('</td>','')
-            ip,port,ptype = line.split('<td>')
-
-            if 'socks5' in ptype.lower():
-                proxlist.append(f'{ip}:{port}')
     else:
         return []
+    
+    page = requests.get('http://proxylist.fatezero.org/proxy.list')
+    for line in page.text.splitlines():
+        line = json.loads(line)
+        if protodict[proto] in line['type'].lower():
+            try: proxlist.append(f'{line["host"]}:{str(line["port"])}')
+            except Exception: pass
+    
+    page = requests.get('https://raw.githubusercontent.com/stamparm/aux/master/fetch-some-list.txt').text
+    for obj in json.loads(page):
+        if protodict[proto] in obj['proto']:
+            proxlist.append(f'{obj["ip"]}:{obj["port"]}')
+    
+    page = requests.get('https://scrapingant.com/proxies').text
+    for line in re.findall(r'<tr><td>\d+\.\d+\.\d+\.\d+<\/td><td>\d+<\/td><td>.*?<\/td>', page):
+        line=line.replace('<tr><td>','').replace('</td>','')
+        ip,port,ptype = line.split('<td>')
+
+        if protodict[proto] in ptype.lower():
+            proxlist.append(f'{ip}:{port}')
+    
+    page = requests.get('https://hidemy.name/en/proxy-list/#list', headers={'User-Agent': 'not-requests/xd'})
+    part = page.text.split("<tbody>")[1].split("</tbody>")[0].split("<tr><td>")
+
+    for line in part:
+        proxtype = None
+        line = line.replace('</td><td>', ':')
+        found = re.findall(r'</div></div>:(.*?):', line)
+
+        if found != None and len(found) != 0: proxtype = found[0]
+        else: continue
+
+        if protodict[proto] in proxtype.lower():
+            proxy = ':'.join(line.split(':', 2)[:2]).rstrip()
+            if proxy != None and len(proxy) != 0 and proxy != '' and bool(re.match(r'\d+\.\d+\.\d+\.\d+\:\d+', proxy)):
+                try: proxlist.append(proxy)
+                except: pass
+    
+    page = requests.get('https://raw.githubusercontent.com/stamparm/aux/master/fetch-some-list.txt').text
+    for obj in json.loads(page):
+        if protodict[proto] in obj['proto'].lower():
+            proxlist.append(f'{obj["ip"]}:{obj["port"]}')
+    
+    page = requests.get('https://raw.githubusercontent.com/proxyips/proxylist/main/proxylistfull.json').text
+    for obj in json.loads(page):
+        if protodict[proto] in obj['Type'].lower():
+            proxlist.append(f'{obj["Ip"]}:{obj["Port"]}')
     
     for url in urls:
         try:
             proxies = requests.get(url, timeout=5).text
             for ipfound in re.findall(r'\d+\.\d+\.\d+\.\d+\:\d+', proxies):
-                if ipfound != None and len(ipfound) != 0:
+                if ipfound != None and len(ipfound) != 0 and not ipfound.rstrip() in proxlist:
                     proxlist.append(ipfound.rstrip())
         except:
             pass

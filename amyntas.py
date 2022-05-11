@@ -121,7 +121,7 @@ if args['scrape_proxies']:
     print('[INFO] Done.')
 
 # do some checking
-if args['check_proxies_file'] != None:  checker()
+if args['check_proxies_file'] != None: checker(args['check_proxies_file'])
 if args['target'] is None: sys.exit(f'[ERROR] No target specified.')
 if not attack_method in method_dict.keys(): sys.exit(f'[ERROR] Invalid method.')
 if attack_method in ['BYPASS', 'PROXY'] and args['proxy_file_path'] is None: sys.exit(f'[ERROR] The "{attack_method}" method needs a proxy list!')

