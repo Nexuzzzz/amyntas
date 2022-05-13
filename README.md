@@ -1,6 +1,7 @@
 ## NOTE!
 Results may vary A LOT when attacking! <br>
-It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know! <bn>
+It might peak at 40k rq/s and drop down to 2k rq/s or peak at 169 requests per second, just so you know! <br>
+Also, for the `BYPASS` attack to work on <strong>\*nix</strong> you need to replace the `.exe` executable with the ELF binary.
 
 --- 
 

@@ -18,7 +18,7 @@ def giveproxy(force_give=False):
 def checkproxy(proxy):
     try:
         proto = Core.proxy_type.lower()
-        requests.get(
+        req = requests.get(
             choice([
                 'https://api.ipify.org/?format=text',
                 'https://myexternalip.com/raw',
@@ -45,7 +45,7 @@ def checkproxy(proxy):
             stream=False
         )
 
-        return True # no errors, request sent!
+        return proxy.split(':')[0] in req.text.lower() # no errors, request sent! the reason why we do not check for responses is because they could be blocked
     except requests.exceptions.ConnectionError or \
          requests.exceptions.ConnectTimeout: return False
 
@@ -141,8 +141,16 @@ def scraper(proto=5):
             'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/http.txt',
             'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt',
             'https://raw.githubusercontent.com/Volodichev/proxy-list/main/http.txt',
-            'https://raw.githubusercontent.com/Volodichev/proxy-list/main/http_old.txt'
+            'https://raw.githubusercontent.com/Volodichev/proxy-list/main/http_old.txt',
+            'https://spys.me/proxy.txt',
+            'https://www.my-proxy.com/free-elite-proxy.html'
+            'https://www.my-proxy.com/free-anonymous-proxy.html',
+            'https://www.my-proxy.com/free-transparent-proxy.html',
+            'http://proxysearcher.sourceforge.net/Proxy%20List.php?type=http'
         ]
+
+        for i in range(9):
+            urls.append(f'https://www.my-proxy.com/free-proxy-list{"-"+str(i+i) if i != 0 else ""}.html')
 
     elif proto == 4: # SOCKS4
         urls = [
@@ -160,7 +168,8 @@ def scraper(proto=5):
             'https://raw.githubusercontent.com/UptimerBot/proxy-list/main/proxies/socks4.txt',
             'https://openproxy.space/list/socks4',
             'http://proxydb.net/?socks4&anonlvl=1&anonlvl=2&anonlvl=3&anonlvl=4&country=',
-            'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/socks4.txt'
+            'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/socks4.txt',
+            'https://www.my-proxy.com/free-socks-4-proxy.html',
 		]
 
         page = requests.get('https://www.socks-proxy.net/#list').text
@@ -192,7 +201,11 @@ def scraper(proto=5):
             'https://raw.githubusercontent.com/UptimerBot/proxy-list/main/proxies/socks5.txt',
             'https://openproxy.space/list/socks5',
             'http://proxydb.net/?protocol=socks4&protocol=socks5&anonlvl=1&anonlvl=2&anonlvl=3&anonlvl=4&country=',
-            'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/socks5.txt'
+            'https://raw.githubusercontent.com/rdavydov/proxy-list/main/proxies/socks5.txt',
+            'https://spys.me/socks.txt',
+            'https://www.my-proxy.com/free-socks-5-proxy.html',
+            'http://proxysearcher.sourceforge.net/Proxy%20List.php?type=socks',
+            'http://www.socks24.org/feeds/posts/default'
         ]
     else:
         return []

@@ -69,7 +69,7 @@ def get_cookie(url):
         options.add_argument(argument)
 
     print('[BYPASS] Launching browser')
-    driver = webdriver.Chrome(options=options, driver_executable_path='src\\drivers\\chromedriver.exe')
+    driver = webdriver.Chrome(options=options, driver_executable_path='src\\drivers\\chromedriver'+('.exe' if os.name == 'nt' else ''))
     driver.implicitly_wait(3)
     driver.get(url)
 
