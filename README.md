@@ -1,6 +1,6 @@
 ## READ THIS FIRST
-I'm currently busy working on a better version of Amyntas, which will add more support for other OS's and will include a lot of fixes and new stuff. <br>
-In the mean time, i don't think i will update this tool so its recommended you just hang on tight untill i release my other tool. Thank you!
+I've started working on a new tool, called [Cerberus](https://github.com/Nexuzzzz/Cerberus), its better than Amyntas and will have more frequent updates <br>
+This tool will remain public, but i will <strong>NOT</strong> release any more updates
 
 ## NOTE!
 Results may vary A LOT when attacking! <br>
